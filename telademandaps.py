@@ -1,8 +1,3 @@
-# Decompiled with PyLingual (https://pylingual.io)
-# Internal filename: telademandaps.py
-# Bytecode version: 3.12.0rc2 (3531)
-# Source timestamp: 1970-01-01 00:00:00 UTC (0)
-
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtWidgets import QMessageBox, QTableWidget, QComboBox, QVBoxLayout
 from GRADE import Ui_CTI_PED
@@ -42,6 +37,9 @@ class Ui_Demanda(QtWidgets.QMainWindow):
         self.nome_user = nome_user
         self.t = 'Demanda'
         self.user = user
+
+        self.tabela_atual = 'tabela_demanda_ps'
+
         self.janela_CTI_PED = QtWidgets.QMainWindow()
         script_directory = QStandardPaths.writableLocation(QStandardPaths.StandardLocation.AppDataLocation)
         config_file_path = f'{script_directory}/config.ini'
@@ -1925,6 +1923,13 @@ class Ui_Demanda(QtWidgets.QMainWindow):
             self.posicao_inicial_colum = current_item.column()
 
     def atualiza_ps(self, tabela):
+
+        for colum in range(self.tabelademan.columnCount()):
+            item_pac = self.tabelademan.horizontalHeaderItem(colum)
+            if item_pac.text() == 'NPF':
+                self.tabelademan.hideColumn(colum)
+
+        self.tabela_atual = tabela
         if self.tabelademan.currentItem():
             self.selection = (self.tabelademan.currentRow(), self.tabelademan.currentColumn())
         conexao = mysql.connector.connect(host='10.36.0.32', user='sglHC2024', password='S4g1L81', database='sgl')
@@ -2304,6 +2309,7 @@ class Ui_Demanda(QtWidgets.QMainWindow):
         colum_leito_atual = 0
         colum_clinica = 0
         colum_data_de_confirmacao = 0
+        colum_data_rese = 0
         for colum in range(self.tabelademan.columnCount()):
             item_pac = self.tabelademan.horizontalHeaderItem(colum)
             if item_pac.text() == 'LEITO RESERVADO':
@@ -2332,7 +2338,15 @@ class Ui_Demanda(QtWidgets.QMainWindow):
                 colum_cirurgia_liberada = colum
             if item_pac.text() == 'MOTIVO DO CANCELAMENTO':
                 colum_motivo_do_cancelamento = colum
+            if item_pac.text() ==  'DATA E HORA DA RESERVA':
+                colum_data_rese = colum
         if self.tabelademan.rowCount() > 0:
+            # Proibindo a edição de colunas para o PS
+            if self.dept == 'PS' and self.tabela_atual == 'tabela_demanda_ps':
+                for row in range(self.tabelademan.rowCount()):
+                    for col in range(colum_status_alta, self.tabelademan.columnCount()):
+                        item = self.tabelademan.item(row, col)
+                        item.setFlags(item.flags() & ~Qt.ItemFlag.ItemIsEditable)
             self.timer_ps.stop()
             _translate = QtCore.QCoreApplication.translate
             self.btnalterar.setText(_translate('MainWindow', 'CONCLUIR ALTERAÇÃO'))
