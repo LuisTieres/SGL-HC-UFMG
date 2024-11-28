@@ -326,8 +326,8 @@ class Ui_Form(object):
 
             label.setAlignment(Qt.AlignmentFlag.AlignCenter)
             label.setCursor(Qt.CursorShape.OpenHandCursor)
-            label.mousePressEvent = lambda event, label=label: self.mousePressEvent(event, label)
-            label.mouseMoveEvent = lambda event, label=label: self.mouseMoveEvent(event, label)
+            label.mousePressEvent = lambda event, label_aux=label: self.mousePressEvent(event, label_aux)
+            label.mouseMoveEvent = lambda event, label_aux=label: self.mouseMoveEvent(event, label_aux)
             label.setWordWrap(True)
             fonte = QFont()
             fonte.setPointSize(10)
@@ -337,10 +337,10 @@ class Ui_Form(object):
             label.setAlignment(Qt.AlignmentFlag.AlignCenter)
             tooltip_text = f'Leito {row}'
             label.setToolTip(tooltip_text)
-        else:
-            self.conf_layout()
-            self.frame_4.move(80, 60)
-            self.retranslateUi(Form)
+
+        self.conf_layout()
+        self.frame_4.move(80, 60)
+        self.retranslateUi(Form)
 
     def mousePressEvent(self, event, label):
         label.mouse_offset = event.pos()

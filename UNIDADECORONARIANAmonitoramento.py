@@ -13,48 +13,59 @@ class Ui_Form(object):
         config_file_path = f'{script_directory}/config.ini'
         self.settings = QSettings(config_file_path, QSettings.Format.IniFormat)
         self.form = Form
+
+        # Front-end
         self.frame = QtWidgets.QFrame(parent=self.frame_tela)
         self.frame.setGeometry(QtCore.QRect(200, 80, 681, 221))
         self.frame.setStyleSheet('background-color: rgb(255, 255, 255);')
         self.frame.setFrameShape(QtWidgets.QFrame.Shape.StyledPanel)
         self.frame.setFrameShadow(QtWidgets.QFrame.Shadow.Raised)
         self.frame.setObjectName('frame')
+
+        #Linhas da parede
         self.line_15 = QtWidgets.QFrame(parent=self.frame)
         self.line_15.setGeometry(QtCore.QRect(1149, 130, 51, 3))
         self.line_15.setFrameShape(QtWidgets.QFrame.Shape.HLine)
         self.line_15.setFrameShadow(QtWidgets.QFrame.Shadow.Sunken)
         self.line_15.setObjectName('line_15')
+
         self.line_25 = QtWidgets.QFrame(parent=self.frame)
         self.line_25.setGeometry(QtCore.QRect(0, 165, 679, 4))
         self.line_25.setFrameShape(QtWidgets.QFrame.Shape.HLine)
         self.line_25.setFrameShadow(QtWidgets.QFrame.Shadow.Sunken)
         self.line_25.setObjectName('line_25')
+
         self.line_26 = QtWidgets.QFrame(parent=self.frame)
         self.line_26.setGeometry(QtCore.QRect(0, 50, 681, 4))
         self.line_26.setFrameShape(QtWidgets.QFrame.Shape.HLine)
         self.line_26.setFrameShadow(QtWidgets.QFrame.Shadow.Sunken)
         self.line_26.setObjectName('line_26')
+
         self.line_27 = QtWidgets.QFrame(parent=self.frame)
         self.line_27.setGeometry(QtCore.QRect(580, 0, 4, 51))
         self.line_27.setFrameShape(QtWidgets.QFrame.Shape.VLine)
         self.line_27.setFrameShadow(QtWidgets.QFrame.Shadow.Sunken)
         self.line_27.setObjectName('line_27')
+
         self.line_34 = QtWidgets.QFrame(parent=self.frame)
         self.line_34.setGeometry(QtCore.QRect(50, 110, 630, 3))
         self.line_34.setStyleSheet('background-color: rgb(0, 0, 0);')
         self.line_34.setFrameShape(QtWidgets.QFrame.Shape.HLine)
         self.line_34.setFrameShadow(QtWidgets.QFrame.Shadow.Sunken)
         self.line_34.setObjectName('line_34')
+
         self.line_28 = QtWidgets.QFrame(parent=self.frame)
         self.line_28.setGeometry(QtCore.QRect(600, 50, 4, 61))
         self.line_28.setFrameShape(QtWidgets.QFrame.Shape.VLine)
         self.line_28.setFrameShadow(QtWidgets.QFrame.Shadow.Sunken)
         self.line_28.setObjectName('line_28')
+
         self.line_36 = QtWidgets.QFrame(parent=self.frame)
         self.line_36.setGeometry(QtCore.QRect(410, 50, 4, 61))
         self.line_36.setFrameShape(QtWidgets.QFrame.Shape.VLine)
         self.line_36.setFrameShadow(QtWidgets.QFrame.Shadow.Sunken)
         self.line_36.setObjectName('line_36')
+
         self.label = QtWidgets.QLabel(parent=self.frame)
         self.label.setGeometry(QtCore.QRect(330, 90, 81, 41))
         font = QtGui.QFont()
@@ -65,16 +76,19 @@ class Ui_Form(object):
         self.label.setStyleSheet('color: white;\nbackground-color:BLACK;\nborder-color: transparent; \ntransform: rotate(270deg);')
         self.label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.label.setObjectName('label')
+
         self.line_37 = QtWidgets.QFrame(parent=self.frame)
         self.line_37.setGeometry(QtCore.QRect(460, 0, 4, 51))
         self.line_37.setFrameShape(QtWidgets.QFrame.Shape.VLine)
         self.line_37.setFrameShadow(QtWidgets.QFrame.Shadow.Sunken)
         self.line_37.setObjectName('line_37')
+
         self.line_38 = QtWidgets.QFrame(parent=self.frame)
         self.line_38.setGeometry(QtCore.QRect(340, 0, 4, 51))
         self.line_38.setFrameShape(QtWidgets.QFrame.Shape.VLine)
         self.line_38.setFrameShadow(QtWidgets.QFrame.Shadow.Sunken)
         self.line_38.setObjectName('line_38')
+
         self.line_39 = QtWidgets.QFrame(parent=self.frame)
         self.line_39.setGeometry(QtCore.QRect(210, 0, 4, 51))
         self.line_39.setFrameShape(QtWidgets.QFrame.Shape.VLine)
@@ -85,67 +99,79 @@ class Ui_Form(object):
         self.line_40.setFrameShape(QtWidgets.QFrame.Shape.VLine)
         self.line_40.setFrameShadow(QtWidgets.QFrame.Shadow.Sunken)
         self.line_40.setObjectName('line_40')
+
         self.line_41 = QtWidgets.QFrame(parent=self.frame)
         self.line_41.setGeometry(QtCore.QRect(510, 50, 4, 61))
         self.line_41.setFrameShape(QtWidgets.QFrame.Shape.VLine)
         self.line_41.setFrameShadow(QtWidgets.QFrame.Shadow.Sunken)
         self.line_41.setObjectName('line_41')
+
         self.line_42 = QtWidgets.QFrame(parent=self.frame)
         self.line_42.setGeometry(QtCore.QRect(210, 114, 4, 105))
         self.line_42.setFrameShape(QtWidgets.QFrame.Shape.VLine)
         self.line_42.setFrameShadow(QtWidgets.QFrame.Shadow.Sunken)
         self.line_42.setObjectName('line_42')
+
         self.line_43 = QtWidgets.QFrame(parent=self.frame)
         self.line_43.setGeometry(QtCore.QRect(460, 114, 4, 105))
         self.line_43.setFrameShape(QtWidgets.QFrame.Shape.VLine)
         self.line_43.setFrameShadow(QtWidgets.QFrame.Shadow.Sunken)
         self.line_43.setObjectName('line_43')
+
         self.line_44 = QtWidgets.QFrame(parent=self.frame)
         self.line_44.setGeometry(QtCore.QRect(560, 113, 4, 105))
         self.line_44.setFrameShape(QtWidgets.QFrame.Shape.VLine)
         self.line_44.setFrameShadow(QtWidgets.QFrame.Shadow.Sunken)
         self.line_44.setObjectName('line_44')
+
         self.line_45 = QtWidgets.QFrame(parent=self.frame)
         self.line_45.setGeometry(QtCore.QRect(340, 130, 4, 88))
         self.line_45.setFrameShape(QtWidgets.QFrame.Shape.VLine)
         self.line_45.setFrameShadow(QtWidgets.QFrame.Shadow.Sunken)
         self.line_45.setObjectName('line_45')
+
         self.line_60 = QtWidgets.QFrame(parent=self.frame)
         self.line_60.setGeometry(QtCore.QRect(0, 164, 3, 56))
         self.line_60.setStyleSheet('background-color: rgb(0, 0, 0);')
         self.line_60.setFrameShape(QtWidgets.QFrame.Shape.VLine)
         self.line_60.setFrameShadow(QtWidgets.QFrame.Shadow.Sunken)
         self.line_60.setObjectName('line_60')
+
         self.line_61 = QtWidgets.QFrame(parent=self.frame)
         self.line_61.setGeometry(QtCore.QRect(0, 0, 3, 56))
         self.line_61.setStyleSheet('background-color: rgb(0, 0, 0);')
         self.line_61.setFrameShape(QtWidgets.QFrame.Shape.VLine)
         self.line_61.setFrameShadow(QtWidgets.QFrame.Shadow.Sunken)
         self.line_61.setObjectName('line_61')
+
         self.frame_8 = QtWidgets.QFrame(parent=self.frame)
         self.frame_8.setGeometry(QtCore.QRect(0, 50, 50, 121))
         self.frame_8.setStyleSheet('background-color: #c0c0c0;\nborder-color: transparent; ')
         self.frame_8.setFrameShape(QtWidgets.QFrame.Shape.StyledPanel)
         self.frame_8.setFrameShadow(QtWidgets.QFrame.Shadow.Raised)
         self.frame_8.setObjectName('frame_8')
+
         self.frame_4 = QtWidgets.QFrame(parent=self.frame)
         self.frame_4.setGeometry(QtCore.QRect(45, 50, 50, 43))
         self.frame_4.setStyleSheet('background-color: #c0c0c0;border: none; ')
         self.frame_4.setFrameShape(QtWidgets.QFrame.Shape.StyledPanel)
         self.frame_4.setFrameShadow(QtWidgets.QFrame.Shadow.Raised)
         self.frame_4.setObjectName('frame_4')
+
         self.frame_7 = QtWidgets.QFrame(parent=self.frame)
         self.frame_7.setGeometry(QtCore.QRect(45, 130, 50, 43))
         self.frame_7.setStyleSheet('background-color: #c0c0c0; border: none;')
         self.frame_7.setFrameShape(QtWidgets.QFrame.Shape.StyledPanel)
         self.frame_7.setFrameShadow(QtWidgets.QFrame.Shadow.Raised)
         self.frame_7.setObjectName('frame_7')
+
         self.frame_12 = QtWidgets.QFrame(parent=self.frame_tela)
         self.frame_12.setGeometry(QtCore.QRect(900, 160, 147, 157))
         self.frame_12.setStyleSheet('background-color: rgb(255, 255, 255);\nborder: 2px solid #2E3D48')
         self.frame_12.setFrameShape(QtWidgets.QFrame.Shape.StyledPanel)
         self.frame_12.setFrameShadow(QtWidgets.QFrame.Shadow.Raised)
         self.frame_12.setObjectName('frame_12')
+
         self.label_ocupado2_2 = QtWidgets.QLabel(parent=self.frame_12)
         self.label_ocupado2_2.setGeometry(QtCore.QRect(40, 130, 81, 21))
         font = QtGui.QFont()
@@ -167,6 +193,7 @@ class Ui_Form(object):
         self.label_vago2_2.setFont(font)
         self.label_vago2_2.setStyleSheet('background-color: rgb(255, 255, 255);\nborder: transparent;')
         self.label_vago2_2.setObjectName('label_vago2_2')
+
         self.label_reservado2_2 = QtWidgets.QLabel(parent=self.frame_12)
         self.label_reservado2_2.setGeometry(QtCore.QRect(40, 70, 101, 21))
         font = QtGui.QFont()
@@ -174,6 +201,7 @@ class Ui_Form(object):
         self.label_reservado2_2.setFont(font)
         self.label_reservado2_2.setStyleSheet('background-color: rgb(255, 255, 255);\nborder: transparent;')
         self.label_reservado2_2.setObjectName('label_reservado2_2')
+
         self.cor_legenda_red_2 = QtWidgets.QLabel(parent=self.frame_12)
         self.cor_legenda_red_2.setGeometry(QtCore.QRect(10, 130, 21, 21))
         self.cor_legenda_red_2.setStyleSheet('\nborder: transparent;background-color: rgb(255, 0, 0);')
@@ -189,6 +217,7 @@ class Ui_Form(object):
         self.cor_legenda_blue_3.setStyleSheet('background-color: rgb(170, 255, 255);\nborder-left-color: rgb(0, 0, 0);\nborder-bottom-color: rgb(0, 0, 0);\nborder-right-color: rgb(0, 0, 0);\nborder-right-color: rgb(0, 0, 0);\nborder-top-color: rgb(0, 0, 0);\nborder-color: rgb(0, 0, 0);\nborder: transparent;')
         self.cor_legenda_blue_3.setText('')
         self.cor_legenda_blue_3.setObjectName('cor_legenda_blue_3')
+
         self.legenda_2 = QtWidgets.QLabel(parent=self.frame_12)
         self.legenda_2.setGeometry(QtCore.QRect(10, 10, 91, 16))
         font = QtGui.QFont()
@@ -196,17 +225,20 @@ class Ui_Form(object):
         self.legenda_2.setFont(font)
         self.legenda_2.setStyleSheet('background-color: rgb(255, 255, 255);\nborder: transparent;')
         self.legenda_2.setObjectName('legenda_2')
+
         self.cor_legenda_yellow_2 = QtWidgets.QLabel(parent=self.frame_12)
         self.cor_legenda_yellow_2.setGeometry(QtCore.QRect(10, 70, 21, 21))
         self.cor_legenda_yellow_2.setStyleSheet('\nborder: transparent;\nbackground-color: rgb(255, 255, 0);')
         self.cor_legenda_yellow_2.setText('')
         self.cor_legenda_yellow_2.setObjectName('cor_legenda_yellow_2')
+
         self.frame_6 = QtWidgets.QFrame(parent=self.frame_tela)
         self.frame_6.setGeometry(QtCore.QRect(1060, 160, 199, 161))
         self.frame_6.setStyleSheet('background-color: rgb(255, 255, 255);\nborder: 2px solid #2E3D48')
         self.frame_6.setFrameShape(QtWidgets.QFrame.Shape.StyledPanel)
         self.frame_6.setFrameShadow(QtWidgets.QFrame.Shadow.Raised)
         self.frame_6.setObjectName('frame_6')
+
         self.label_ocupado1_2 = QtWidgets.QLabel(parent=self.frame_6)
         self.label_ocupado1_2.setGeometry(QtCore.QRect(10, 130, 91, 21))
         font = QtGui.QFont()
@@ -214,6 +246,7 @@ class Ui_Form(object):
         self.label_ocupado1_2.setFont(font)
         self.label_ocupado1_2.setStyleSheet('\nborder: transparent;background-color: rgb(255, 255, 255);')
         self.label_ocupado1_2.setObjectName('label_ocupado1_2')
+
         self.label_tabela_2 = QtWidgets.QLabel(parent=self.frame_6)
         self.label_tabela_2.setGeometry(QtCore.QRect(10, 10, 91, 16))
         font = QtGui.QFont()
@@ -221,12 +254,14 @@ class Ui_Form(object):
         self.label_tabela_2.setFont(font)
         self.label_tabela_2.setStyleSheet('\nborder: transparent;background-color: rgb(255, 255, 255);')
         self.label_tabela_2.setObjectName('label_tabela_2')
+
         self.qt_vago_2 = QtWidgets.QLabel(parent=self.frame_6)
         self.qt_vago_2.setGeometry(QtCore.QRect(130, 40, 61, 21))
         font = QtGui.QFont()
         self.qt_vago_2.setFont(font)
         self.qt_vago_2.setStyleSheet('\nborder: transparent;background-color: rgb(255, 255, 255);')
         self.qt_vago_2.setObjectName('qt_vago_2')
+
         self.label_bloq1_2 = QtWidgets.QLabel(parent=self.frame_6)
         self.label_bloq1_2.setGeometry(QtCore.QRect(10, 100, 111, 21))
         font = QtGui.QFont()
@@ -234,18 +269,21 @@ class Ui_Form(object):
         self.label_bloq1_2.setFont(font)
         self.label_bloq1_2.setStyleSheet('\nborder: transparent;background-color: rgb(255, 255, 255);')
         self.label_bloq1_2.setObjectName('label_bloq1_2')
+
         self.qt_reservado_2 = QtWidgets.QLabel(parent=self.frame_6)
         self.qt_reservado_2.setGeometry(QtCore.QRect(130, 70, 61, 21))
         font = QtGui.QFont()
         self.qt_reservado_2.setFont(font)
         self.qt_reservado_2.setStyleSheet('\nborder: transparent;background-color: rgb(255, 255, 255);')
         self.qt_reservado_2.setObjectName('qt_reservado_2')
+
         self.qt_bloqueado_2 = QtWidgets.QLabel(parent=self.frame_6)
         self.qt_bloqueado_2.setGeometry(QtCore.QRect(130, 100, 61, 21))
         font = QtGui.QFont()
         self.qt_bloqueado_2.setFont(font)
         self.qt_bloqueado_2.setStyleSheet('\nborder: transparent;background-color: rgb(255, 255, 255);')
         self.qt_bloqueado_2.setObjectName('qt_bloqueado_2')
+
         self.label_reser1_2 = QtWidgets.QLabel(parent=self.frame_6)
         self.label_reser1_2.setGeometry(QtCore.QRect(10, 70, 111, 21))
         font = QtGui.QFont()
@@ -253,12 +291,14 @@ class Ui_Form(object):
         self.label_reser1_2.setFont(font)
         self.label_reser1_2.setStyleSheet('\nborder: transparent;background-color: rgb(255, 255, 255);')
         self.label_reser1_2.setObjectName('label_reser1_2')
+
         self.qt_ocupado_2 = QtWidgets.QLabel(parent=self.frame_6)
         self.qt_ocupado_2.setGeometry(QtCore.QRect(130, 130, 61, 21))
         font = QtGui.QFont()
         self.qt_ocupado_2.setFont(font)
         self.qt_ocupado_2.setStyleSheet('\nborder: transparent;background-color: rgb(255, 255, 255);')
         self.qt_ocupado_2.setObjectName('qt_ocupado_2')
+
         self.label_vago1_2 = QtWidgets.QLabel(parent=self.frame_6)
         self.label_vago1_2.setGeometry(QtCore.QRect(10, 40, 61, 21))
         font = QtGui.QFont()
@@ -266,21 +306,24 @@ class Ui_Form(object):
         self.label_vago1_2.setFont(font)
         self.label_vago1_2.setStyleSheet('\nborder: transparent;background-color: rgb(255, 255, 255);')
         self.label_vago1_2.setObjectName('label_vago1_2')
+
         self.frame_3 = QtWidgets.QFrame(parent=self.frame_tela)
         self.frame_3.setGeometry(QtCore.QRect(150, 520, 50, 50))
         self.frame_3.setStyleSheet('background-color: #c0c0c0;\nborder-color: transparent; ')
         self.frame_3.setFrameShape(QtWidgets.QFrame.Shape.StyledPanel)
         self.frame_3.setFrameShadow(QtWidgets.QFrame.Shadow.Raised)
         self.frame_3.setObjectName('frame_3')
+
         if self.tela.help_sccrol_painel == True:
             self.tela.monitora = False
             self.tela.abri_cti(Form, 'UNIDADE DE INTERNAÇÃO CORONARIANA - 03N')
         self.labels = []
+
         for row in range(self.tela.conta_linha()):
             leito = self.tela.leito(row)
             if self.tela.help_sccrol_painel:
                 label = QLabel(leito.text(), self.frame_tela)
-            else:  # Inserido
+            else:
                 label = QLabel(leito.text(), self.tela.frame_do_monitoramento)
 
             label.setGeometry(0, 0, 60, 25)
@@ -298,19 +341,20 @@ class Ui_Form(object):
                             y = int(data[row][2])
                             label.setGeometry(x, y, 70, 25)
                             break
+
                     label.setAlignment(Qt.AlignmentFlag.AlignCenter)
                     label.setCursor(Qt.CursorShape.OpenHandCursor)
-                    label.mousePressEvent = lambda event, label=label: self.mousePressEvent(event, label)
-                    label.mouseMoveEvent = lambda event, label=label: self.mouseMoveEvent(event, label)
+                    label.mousePressEvent = lambda event, label_aux=label: self.mousePressEvent(event, label_aux)
+                    label.mouseMoveEvent = lambda event, label_aux=label: self.mouseMoveEvent(event, label_aux)
                     label.setWordWrap(True)
                     fonte = QFont()
                     fonte.setPointSize(10)
                     label.setFont(fonte)
                     label.setStyleSheet('background-color: rgb(170, 255, 255);')
+
                     self.labels.append(label)
             except FileNotFoundError:
                 print(1)
-        else:  # Inserido
             self.atualizar_monitoramento(Form)
             self.conf_layout()
             if self.tela.help_sccrol_painel:

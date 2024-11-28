@@ -31,44 +31,64 @@ class CustomTableWidget(QTableWidget):
 class Ui_Demanda(QtWidgets.QMainWindow):
 
     def setupUi(self, MainWindow, departamento=None, user=None, nome_user=None):
+        #Define posição inicial na tabela
         self.posicao_inicial_row = 0
         self.posicao_inicial_colum = 0
         self.selection = None
+
+        #Nome do Usuário
         self.nome_user = nome_user
+
+        #Tela atual
         self.t = 'Demanda'
+
+        # Login do usuário
         self.user = user
 
+        #Tabela atual
         self.tabela_atual = 'tabela_demanda_ps'
 
+        #Janela Principal
         self.janela_CTI_PED = QtWidgets.QMainWindow()
         script_directory = QStandardPaths.writableLocation(QStandardPaths.StandardLocation.AppDataLocation)
         config_file_path = f'{script_directory}/config.ini'
         self.settings = QSettings(config_file_path, QSettings.Format.IniFormat)
+
         MainWindow.setObjectName('MainWindow')
         MainWindow.showMaximized()
         self.variavel = 0
         self.clicked = False
+
+        # Define o ícone da janela principal
         icon = QIcon('icone_p_eUO_icon.ico')
         MainWindow.setWindowIcon(icon)
         self.mainwindow = MainWindow
         self.dept = departamento
         self.centralwidget = QtWidgets.QWidget(parent=MainWindow)
         self.centralwidget.setObjectName('centralwidget')
+
+        #Status das Pop-ups
         self.cadastro_Aberta = False
         self.reserva_Aberta = False
         self.procurar_Aberta = False
         self.conta_do_usuario_Aberta = False
         self.config_Aberta = False
+
+        #Layout da Tela
         self.horizontalLayout = QtWidgets.QHBoxLayout(self.centralwidget)
         self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout.setSpacing(0)
         self.horizontalLayout.setObjectName('horizontalLayout')
+
+        #Frame principal da tela
         self.frame = QtWidgets.QFrame(parent=MainWindow)
         self.frame.setStyleSheet('background-color: #5DADE2;')
         self.frame.setFrameShape(QtWidgets.QFrame.Shape.StyledPanel)
         self.frame.setFrameShadow(QtWidgets.QFrame.Shadow.Raised)
         self.frame.setObjectName('frame')
         self.horizontalLayout.addWidget(self.frame)
+
+        #Todo o layout do gráfico
         self.frame_do_grafico = QtWidgets.QFrame(parent=MainWindow)
         self.frame_do_grafico.setGeometry(QtCore.QRect(0, 200, 1500, 1000))
         self.frame_do_grafico.setStyleSheet('background-color: transparent;')
@@ -76,64 +96,82 @@ class Ui_Demanda(QtWidgets.QMainWindow):
         self.frame_do_grafico.setFrameShadow(QtWidgets.QFrame.Shadow.Raised)
         self.frame_do_grafico.setObjectName('frame')
         self.frame_do_grafico.hide()
+
         self.layout = QVBoxLayout(self.frame_do_grafico)
         self.figure, self.ax = plt.subplots(figsize=(6, 6))
         self.canvas = FigureCanvas(self.figure)
         self.layout.addWidget(self.canvas)
+
         self.progress = QtWidgets.QProgressBar(parent=self.frame_do_grafico)
         self.progress.setGeometry(QtCore.QRect(900, 320, 210, 31))
         self.canvas.setMaximumSize(900, 1100)
         self.figure.set_size_inches(6, 9)
+
         screen = QGuiApplication.primaryScreen()
         size = screen.size()
         self.btn_width = size.width() - 206
         tabela_width = size.width() - 226
         tabela_height = size.height() - 338
+
+        # Tabela de demandas
         self.tabelademan = CustomTableWidget(self.dept, parent=self.frame)
         self.tabelademan.setGeometry(QtCore.QRect(0, 125, tabela_width, tabela_height))
         self.tabelademan.setStyleSheet('background-color: rgb(255, 255, 255);gridline-color: black;')
         self.tabelademan.setObjectName('tabelademan')
         self.tabelademan.setColumnCount(15)
         self.tabelademan.setRowCount(0)
+
         self.tabelademan.cellClicked.connect(self.close_frame)
+
+        # Ativa as funções para bloquear a atualização da tabela.
         self.barra = self.tabelademan.horizontalScrollBar().value()
         self.barra_vertical = self.tabelademan.verticalScrollBar().value()
         self.tabelademan.horizontalScrollBar().valueChanged.connect(self.check_scrollbar_value)
         self.tabelademan.verticalScrollBar().valueChanged.connect(self.check_scrollbar_value)
+
+        # Definindo a geometria do sidebar
         screen = QGuiApplication.primaryScreen()
         size = screen.size()
         sidebar_width = 200
         sidebar_x = size.width() - sidebar_width
         sidebar_y = 40
         sidebar_height = self.height() - sidebar_y
+
         self.sidebar = QtWidgets.QFrame(parent=MainWindow)
         self.sidebar.setGeometry(sidebar_x, sidebar_y, sidebar_width, sidebar_height)
         self.sidebar.setStyleSheet('border: 2px solid #2E3D48;background-color: #2E86C1; border-radius: 10px;')
         self.sidebar.setVisible(False)
+
         self.foto_do_usuario = QtWidgets.QLabel(parent=self.sidebar)
         self.foto_do_usuario.setGeometry(QtCore.QRect(10, 10, 145, 121))
         self.foto_do_usuario.setStyleSheet('\nborder: 2px solid #2E3D48;\nborder-radius: 10px;')
         self.foto_do_usuario.setText('')
         self.foto_do_usuario.setObjectName('foto_do_usuario')
+
         caminho_imagem = 'imagem_do_usuario.png'
         if QFile.exists(caminho_imagem):
             pixmap = QPixmap(caminho_imagem)
             self.foto_do_usuario.setPixmap(pixmap)
             self.foto_do_usuario.setScaledContents(True)
+
         sidebar_width = 40
         sidebar_x = size.width() - sidebar_width
         sidebar_y = 40
         icon = QtGui.QIcon('do-utilizador.ico')
         pixmap = icon.pixmap(40, 40)
+
         self.label_icone = ClickableLabel(parent=self.frame)
         self.label_icone.setPixmap(pixmap)
         self.label_icone.setGeometry(QtCore.QRect(sidebar_x, 3, 40, 40))
         self.label_icone.setStyleSheet('border-radius: 10px;')
         self.label_icone.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.label_icone.setCursor(QtCore.Qt.CursorShape.OpenHandCursor)
+
         tooltip_text = user
         self.label_icone.setToolTip(tooltip_text)
         self.label_icone.clicked.connect(self.onIconClick)
+
+        # Adicionando botões à barra lateral
         if self.dept == 'NIR' or self.dept == 'Administrador':
             self.usuario = QtWidgets.QPushButton('USUÁRIO', self.sidebar)
             self.usuario.clicked.connect(lambda: self.abrir_conta_do_usuario(MainWindow))
@@ -143,15 +181,18 @@ class Ui_Demanda(QtWidgets.QMainWindow):
         self.procura_pac = QtWidgets.QPushButton('PROCCURAR PACIENTE', self.sidebar)
         self.procura_pac.clicked.connect(lambda: self.abrir_procura_pac(MainWindow))
         self.procura_pac.setStyleSheet('\n            QPushButton {\n                border: 2px solid #2E3D48;\n                border-radius: 10px;\n                background-color: #FFFFFF;\n                color: #2E3D48;\n            }\n            QPushButton:pressed {\n                background-color: #2E3D48;\n                color: #FFFFFF;\n            }\n        ')
+
         self.configura = QtWidgets.QPushButton('CONFIGURAÇÕES', self.sidebar)
         self.configura.setStyleSheet('\n            QPushButton {\n                border: 2px solid #2E3D48;\n                border-radius: 10px;\n                background-color: #FFFFFF;\n                color: #2E3D48;\n            }\n            QPushButton:pressed {\n                background-color: #2E3D48;\n                color: #FFFFFF;\n            }\n        ')
         self.configura.clicked.connect(lambda: self.abrir_configuracoes(MainWindow))
+
         item = self.nome_user
         tamnaho = len(item)
         login = ''
         i = 0
         space_atual = 0
         quantidade_space = 0
+
         for j in range(tamnaho):
             if item[j] == ' ':
                 quantidade_space += 1
@@ -167,18 +208,24 @@ class Ui_Demanda(QtWidgets.QMainWindow):
                 analise = 0
         font = QtGui.QFont()
         font.setPointSize(12)
+
         self.NOME = QtWidgets.QLabel(login, self.sidebar)
         self.NOME.setFont(font)
         self.NOME.setGeometry(10, 150, 180, 30)
         self.NOME.setStyleSheet('border: 2px solid transparent; border-radius: 10px;')
+
         self.configura.setGeometry(10, 300, 180, 30)
 
         if self.dept == 'NIR' or self.dept == 'Administrador':
             self.usuario.setGeometry(10, 200, 180, 30)
 
         self.procura_pac.setGeometry(10, 250, 180, 30)
+
+        #Tabela alternativa para analise de dados
         self.tabela_alt = QtWidgets.QTableWidget()
         self.setCentralWidget(self.frame)
+
+        #Itens da tabela principal
         item = QtWidgets.QTableWidgetItem()
         font = QtGui.QFont('Arial', 15, weight=QtGui.QFont.Weight.Bold)
         font.setPointSize(8)
@@ -283,11 +330,14 @@ class Ui_Demanda(QtWidgets.QMainWindow):
         font.setBold(True)
         font.setWeight(75)
         item.setFont(font)
+
         self.tabelademan.setHorizontalHeaderItem(14, item)
         self.tabelademan.horizontalHeader().setDefaultSectionSize(140)
         self.tabelademan.setEditTriggers(QtWidgets.QTableWidget.EditTrigger.NoEditTriggers)
         self.tabelademan.currentCellChanged.connect(self.get_current_position)
         self.tabelademan.itemSelectionChanged.connect(self.get_current_position)
+
+        #Line edit para pesquisa de pasciente
         self.editbarra = QtWidgets.QLineEdit(parent=self.frame)
         self.editbarra.setObjectName('editbarra')
         self.editbarra.setStyleSheet('border: 2px solid white; border-radius: 10px; background-color: white;')
@@ -295,148 +345,179 @@ class Ui_Demanda(QtWidgets.QMainWindow):
         self.editbarra.textChanged.connect(self.pesquisar)
         icon = QIcon('lupa.ico')
         self.editbarra.addAction(icon, QtWidgets.QLineEdit.ActionPosition.LeadingPosition)
+
         self.labeltitulo = QtWidgets.QLabel(parent=self.frame)
         font = QtGui.QFont()
         font.setPointSize(15)
         self.labeltitulo.setFont(font)
         self.labeltitulo.setObjectName('labeltitulo')
+
         self.btndeman = QtWidgets.QPushButton('SOLICITAÇÃO DE LEITOS', parent=self.frame)
         self.btndeman.setGeometry(QtCore.QRect(0, 0, 100, 23))
         self.btndeman.setObjectName('btndeman')
         self.btndeman.setStyleSheet('\n            QPushButton {\n                border: 2px solid #2E3D48;\n                border-radius: 10px;\n                background-color: #FFFFFF;\n                color: #2E3D48;\n            }F\n            QPushButton:pressed {\n                background-color: #2E3D48;\n                color: #FFFFFF;\n            }\n        ')
+
         self.btngraficos = QtWidgets.QPushButton('GRÁFICOS', parent=self.frame)
         self.btngraficos.setObjectName('btngraficos')
         self.btngraficos.setStyleSheet('\n            QPushButton {\n                border: 2px solid #2E3D48;\n                border-radius: 10px;\n                background-color: #FFFFFF;\n                color: #2E3D48;\n            }\n            QPushButton:pressed {\n                background-color: #2E3D48;\n                color: #FFFFFF;\n            }\n        ')
+
         self.btnsair = QtWidgets.QPushButton('SAIR', parent=self.frame)
         self.btnsair.setObjectName('btnsair')
         self.btnsair.setStyleSheet('\n            QPushButton {\n                border: 2px solid #2E3D48;\n                border-radius: 10px;\n                background-color: #FFFFFF;\n                color: #2E3D48;\n            }\n            QPushButton:pressed {\n                background-color: #2E3D48;\n                color: #FFFFFF;\n            }\n        ')
         self.btnsair.clicked.connect(self.finalizar_operacao)
         self.horizontalLayout.addWidget(self.frame)
         MainWindow.setCentralWidget(self.centralwidget)
+
         self.menubar = QtWidgets.QMenuBar(parent=MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 1332, 21))
         self.menubar.setObjectName('menubar')
         MainWindow.setMenuBar(self.menubar)
+
         self.statusbar = QtWidgets.QStatusBar(parent=MainWindow)
         self.statusbar.setObjectName('statusbar')
         MainWindow.setStatusBar(self.statusbar)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
+
         self.tabelademan.setCurrentCell(self.tabelademan.rowCount() - 1, 0)
         self.frame.mousePressEvent = lambda event: self.toggle_frame_visibility(self.sidebar)
         _translate = QtCore.QCoreApplication.translate
+
         if self.dept == 'NIR' or self.dept == 'Administrador':
             self.btnregis = QtWidgets.QPushButton(parent=self.frame)
             self.btnregis.setGeometry(QtCore.QRect(self.btn_width, 123, 131, 31))
             self.btnregis.setObjectName('btnregis')
             self.btnregis.clicked.connect(lambda: self.abrir_cadastro(MainWindow))
             self.btnregis.setStyleSheet('\n                        QPushButton {\n                            border: 2px solid #2E3D48;\n                            border-radius: 10px;\n                            background-color: #FFFFFF;\n                            color: #2E3D48;\n                        }\n                        QPushButton:pressed {\n                            background-color: #2E3D48;\n                            color: #FFFFFF;\n                        }\n                    ')
+
             self.btnalterar = QtWidgets.QPushButton(parent=self.frame)
             self.btnalterar.setGeometry(QtCore.QRect(self.btn_width, 160, 131, 31))
             self.btnalterar.setObjectName('btnalterar')
             self.btnalterar.clicked.connect(self.altera_table)
             self.btnalterar.setStyleSheet('\n                        QPushButton {\n                            border: 2px solid #2E3D48;\n                            border-radius: 10px;\n                            background-color: #FFFFFF;\n                            color: #2E3D48;\n                        }\n                        QPushButton:pressed {\n                            background-color: #2E3D48;\n                            color: #FFFFFF;\n                        }\n                    ')
             self.editable = False
+
             self.btnexclu = QtWidgets.QPushButton(parent=self.frame)
             self.btnexclu.setGeometry(QtCore.QRect(self.btn_width, 200, 131, 31))
             self.btnexclu.setObjectName('btnexclu')
             self.btnexclu.clicked.connect(self.excluir_demanda)
             self.btnexclu.setStyleSheet('\n                        QPushButton {\n                            border: 2px solid #2E3D48;\n                            border-radius: 10px;\n                            background-color: #FFFFFF;\n                            color: #2E3D48;\n                        }\n                        QPushButton:pressed {\n                            background-color: #2E3D48;\n                            color: #FFFFFF;\n                        }\n                    ')
+
             self.btn_reservar_leito = QtWidgets.QPushButton(parent=self.frame)
             self.btn_reservar_leito.setGeometry(QtCore.QRect(self.btn_width, 240, 131, 31))
             self.btn_reservar_leito.setObjectName('btn_reservar_leito')
             self.btn_reservar_leito.setText(_translate('MainWindow', 'RESERVAR LEITO'))
             self.btn_reservar_leito.clicked.connect(lambda: self.reservar_leito(MainWindow))
             self.btn_reservar_leito.setStyleSheet('\n            QPushButton {\n                border: 2px solid #2E3D48;\n                border-radius: 10px;\n                background-color: #FFFFFF;\n                color: #2E3D48;\n            }\n            QPushButton:pressed {\n                background-color: #2E3D48;\n                color: #FFFFFF;\n            }\n        ')
+
             self.btn_grade = QtWidgets.QPushButton(parent=self.frame)
             self.btn_grade.setGeometry(QtCore.QRect(105, 0, 100, 23))
             self.btn_grade.setObjectName('btn_reservar_leito')
             self.btn_grade.setText(_translate('MainWindow', 'GRADE'))
             self.btn_grade.clicked.connect(lambda: self.abrir_grade(MainWindow))
             self.btn_grade.setStyleSheet('\n            QPushButton {\n                border: 2px solid #2E3D48;\n                border-radius: 10px;\n                background-color: #FFFFFF;\n                color: #2E3D48;\n            }\n            QPushButton:pressed {\n                background-color: #2E3D48;\n                color: #FFFFFF;\n            }\n        ')
+
             self.btn_PRONTO_SOCORRO = QtWidgets.QPushButton(parent=self.frame)
             self.btn_PRONTO_SOCORRO.setGeometry(QtCore.QRect(0, 100, 120, 23))
             self.btn_PRONTO_SOCORRO.setObjectName('btn_PRONTO_SOCORRO')
             self.btn_PRONTO_SOCORRO.setText(_translate('MainWindow', 'PRONTO SOCORRO'))
             self.btn_PRONTO_SOCORRO.clicked.connect(lambda: self.setupUi(MainWindow, self.dept, self.user, self.nome_user))
             self.btn_PRONTO_SOCORRO.setStyleSheet('\n            QPushButton {\n                border: 2px solid #2E3D48;\n                border-radius: 10px;\n                background-color: #FFFFFF;\n                color: #2E3D48;\n            }\n            QPushButton:pressed {\n                background-color: #2E3D48;\n                color: #FFFFFF;\n            }\n        ')
+
             self.btn_ALTAS_CTI = QtWidgets.QPushButton(parent=self.frame)
             self.btn_ALTAS_CTI.setGeometry(QtCore.QRect(125, 100, 100, 23))
             self.btn_ALTAS_CTI.setObjectName('btn_ALTAS_CTI')
             self.btn_ALTAS_CTI.setText(_translate('MainWindow', "ALTA CTI'S"))
             self.btn_ALTAS_CTI.clicked.connect(lambda: self.abrir_tabela_Alta_CTI(MainWindow))
             self.btn_ALTAS_CTI.setStyleSheet('\n            QPushButton {\n                border: 2px solid #2E3D48;\n                border-radius: 10px;\n                background-color: #FFFFFF;\n                color: #2E3D48;\n            }\n            QPushButton:pressed {\n                background-color: #2E3D48;\n                color: #FFFFFF;\n            }\n        ')
+
             self.btn_AGENDA_BLOCO = QtWidgets.QPushButton(parent=self.frame)
             self.btn_AGENDA_BLOCO.setGeometry(QtCore.QRect(230, 100, 100, 23))
             self.btn_AGENDA_BLOCO.setObjectName('btn_AGENDA_BLOCO')
             self.btn_AGENDA_BLOCO.setText(_translate('MainWindow', 'AGENDA BLOCO'))
             self.btn_AGENDA_BLOCO.clicked.connect(lambda: self.abrir_tabela_Agenda_Bloco(MainWindow))
             self.btn_AGENDA_BLOCO.setStyleSheet('\n            QPushButton {\n                border: 2px solid #2E3D48;\n                border-radius: 10px;\n                background-color: #FFFFFF;\n                color: #2E3D48;\n            }\n            QPushButton:pressed {\n                background-color: #2E3D48;\n                color: #FFFFFF;\n            }\n        ')
+
             self.btn_HEMODINÂMICA = QtWidgets.QPushButton(parent=self.frame)
             self.btn_HEMODINÂMICA.setGeometry(QtCore.QRect(335, 100, 100, 23))
             self.btn_HEMODINÂMICA.setObjectName('btn_HEMODINÂMICA')
             self.btn_HEMODINÂMICA.setText(_translate('MainWindow', 'HEMODINÂMICA'))
             self.btn_HEMODINÂMICA.clicked.connect(lambda: self.abrir_tabela_Hemodinamica(MainWindow))
             self.btn_HEMODINÂMICA.setStyleSheet('\n            QPushButton {\n                border: 2px solid #2E3D48;\n                border-radius: 10px;\n                background-color: #FFFFFF;\n                color: #2E3D48;\n            }\n            QPushButton:pressed {\n                background-color: #2E3D48;\n                color: #FFFFFF;\n            }\n        ')
+
             self.btn_INTER_TRAN_EXTE = QtWidgets.QPushButton(parent=self.frame)
             self.btn_INTER_TRAN_EXTE.setGeometry(QtCore.QRect(440, 100, 200, 23))
             self.btn_INTER_TRAN_EXTE.setObjectName('btn_INTER_TRAN_EXTE')
             self.btn_INTER_TRAN_EXTE.setText(_translate('MainWindow', 'INTERNAÇÕES E TRANSF. EXTERNAS'))
             self.btn_INTER_TRAN_EXTE.clicked.connect(lambda: self.abrir_tabela_Inter_Tran_Exte(MainWindow))
             self.btn_INTER_TRAN_EXTE.setStyleSheet('\n            QPushButton {\n                border: 2px solid #2E3D48;\n                border-radius: 10px;\n                background-color: #FFFFFF;\n                color: #2E3D48;\n            }\n            QPushButton:pressed {\n                background-color: #2E3D48;\n                color: #FFFFFF;\n            }\n        ')
+
             self.btn_TRANS_INT = QtWidgets.QPushButton(parent=self.frame)
             self.btn_TRANS_INT.setGeometry(QtCore.QRect(645, 100, 160, 23))
             self.btn_TRANS_INT.setObjectName('btn_TRANS_INT')
             self.btn_TRANS_INT.setText(_translate('MainWindow', 'TRANSFERÊNCIAS INTERNAS'))
             self.btn_TRANS_INT.clicked.connect(lambda: self.abrir_tabela_Tran_Inte(MainWindow))
             self.btn_TRANS_INT.setStyleSheet('\n            QPushButton {\n                border: 2px solid #2E3D48;\n                border-radius: 10px;\n                background-color: #FFFFFF;\n                color: #2E3D48;\n            }\n            QPushButton:pressed {\n                background-color: #2E3D48;\n                color: #FFFFFF;\n            }\n        ')
+
             self.btn_ONCO_HEMATO_PED = QtWidgets.QPushButton(parent=self.frame)
             self.btn_ONCO_HEMATO_PED.setGeometry(QtCore.QRect(810, 100, 130, 23))
             self.btn_ONCO_HEMATO_PED.setObjectName('btn_ONCO_HEMATO_PED')
             self.btn_ONCO_HEMATO_PED.setText(_translate('MainWindow', 'ONCO HEMATO PED'))
             self.btn_ONCO_HEMATO_PED.clicked.connect(lambda: self.abrir_tabela_Onco_Hemato_Ped(MainWindow))
             self.btn_ONCO_HEMATO_PED.setStyleSheet('\n            QPushButton {\n                border: 2px solid #2E3D48;\n                border-radius: 10px;\n                background-color: #FFFFFF;\n                color: #2E3D48;\n            }\n            QPushButton:pressed {\n                background-color: #2E3D48;\n                color: #FFFFFF;\n            }\n        ')
+
             self.btn_confirm_alta = QtWidgets.QPushButton(parent=self.frame)
             self.btn_confirm_alta.setObjectName('btn_confirm_alta')
             self.btn_confirm_alta.setText(_translate('MainWindow', 'CONFIRMAR ALTA'))
             self.btn_confirm_alta.clicked.connect(self.confirm_alta)
             self.btn_confirm_alta.setGeometry(QtCore.QRect())
             self.btn_confirm_alta.setStyleSheet('\n            QPushButton {\n                border: 2px solid #2E3D48;\n                border-radius: 10px;\n                background-color: #FFFFFF;\n                color: #2E3D48;\n            }\n            QPushButton:pressed {\n                background-color: #2E3D48;\n                color: #FFFFFF;\n            }\n        ')
+
             self.frame_personalisa = QtWidgets.QFrame(parent=self.frame)
             self.frame_personalisa.setStyleSheet('\n                                QFrame  {\n                                    background-color: #FFFFFF;\n                                    border-top-right-radius: 20px;\n                                    border-bottom-right-radius: 20px;\n                                    border-left: 1px solid black;\n                                }\n                            ')
             self.frame_personalisa.setFrameShape(QtWidgets.QFrame.Shape.StyledPanel)
             self.frame_personalisa.setFrameShadow(QtWidgets.QFrame.Shadow.Raised)
             self.frame_personalisa.setObjectName('frame_box')
             self.frame_personalisa.hide()
+
             self.btn_filtros = QtWidgets.QPushButton('▼ Selecione uma Data ', parent=self.frame)
             self.btnfechar = QtWidgets.QPushButton(' X ', parent=self.frame)
             self.btn_filtros.setFocus()
             self.btnfechar.setStyleSheet('QPushButton {    border-top-right-radius: 10px;    border-bottom-right-radius: 10px;    border-top-left-radius: 0px;    border-bottom-left-radius: 0px;    background-color: #FFFFFF;    color: #2E3D48;    border: 2px solid #2E3D48;}QPushButton:pressed {    background-color: #2E3D48;    color: #FFFFFF;}')
+
             current_datetime = QDateTime.currentDateTime()
             formatted_date = current_datetime.toString('yyyy')
             formatted_date2 = current_datetime.addYears(-1).toString('yyyy')
+
             self.frame_box = QtWidgets.QFrame(parent=self.frame)
             self.frame_box.setStyleSheet('border: 2px solid white; border-radius: 10px; background-color: white;')
             self.frame_box.setFrameShape(QtWidgets.QFrame.Shape.StyledPanel)
             self.frame_box.setFrameShadow(QtWidgets.QFrame.Shadow.Raised)
             colo = '\n                                        QPushButton {\n\n                                        background-color: #FFFFFF;\n                                        color: #2E3D48;\n                                        border-radius: 10px;\n                                        border-color: transparent;\n                                        }\n                                        QPushButton:hover {\n                                        background-color: #c0c0c0;\n                                        color: #000000;\n                                        }\n                                        QPushButton:pressed {\n                                            background-color: #2E3D48;\n                                            color: #FFFFFF;\n                                        }\n                                    '
+
             self.btn_hoje = QtWidgets.QPushButton('Hoje', self.frame_box)
             self.btn_hoje.setGeometry(QtCore.QRect(0, 0, 150, 20))
             self.btn_hoje.setStyleSheet(colo)
+
             self.btn_7 = QtWidgets.QPushButton('Últimos 7 dias', self.frame_box)
             self.btn_7.setGeometry(QtCore.QRect(0, 20, 150, 20))
             self.btn_7.setStyleSheet(colo)
+
             self.btn_30 = QtWidgets.QPushButton('Últimos 30 dias', self.frame_box)
             self.btn_30.setGeometry(QtCore.QRect(0, 40, 150, 20))
             self.btn_30.setStyleSheet(colo)
+
             self.btn_ano = QtWidgets.QPushButton(f'{formatted_date}', self.frame_box)
             self.btn_ano.setGeometry(QtCore.QRect(0, 60, 150, 20))
             self.btn_ano.setStyleSheet(colo)
+
             self.btn_2ano = QtWidgets.QPushButton(f'{formatted_date2}', self.frame_box)
             self.btn_2ano.setGeometry(QtCore.QRect(0, 80, 150, 20))
             self.btn_2ano.setStyleSheet(colo)
+
             self.btn_personalisa = QtWidgets.QPushButton('Período personalizado >', self.frame_box)
             self.btn_personalisa.setStyleSheet(colo)
             self.btn_filtros.clicked.connect(self.abrir_items)
+
             self.btn_7.clicked.connect(lambda: self.filtros(2))
             self.btn_30.clicked.connect(lambda: self.filtros(3))
             self.btn_ano.clicked.connect(lambda: self.filtros(4))
@@ -445,45 +526,54 @@ class Ui_Demanda(QtWidgets.QMainWindow):
             self.btnfechar.clicked.connect(lambda: self.filtros(0))
             self.btn_personalisa.clicked.connect(self.abrir_personalisa)
             self.btn_personalisa.setGeometry(QtCore.QRect(0, 100, 150, 20))
+
             self.day = 'ONTEM'
             self.btnfechar.hide()
             self.frame_box.hide()
             self.btn_filtros.setStyleSheet('QPushButton {\n                border: 2px solid #2E3D48;\n                border-radius: 10px;\n                background-color: #FFFFFF;\n                color: #2E3D48;\n            }\n            QPushButton:pressed {\n                background-color: #2E3D48;\n                color: #FFFFFF;\n            }')
             ccurrent_datetime = QtCore.QDateTime.currentDateTime()
+
             self.borda_inicio = QtWidgets.QFrame(parent=self.frame_personalisa)
             self.borda_inicio.setStyleSheet('border: 2px solid black; border-radius: 10px; background-color: #FFFFFF;')
             self.borda_inicio.setFrameShape(QtWidgets.QFrame.Shape.StyledPanel)
             self.borda_inicio.setFrameShadow(QtWidgets.QFrame.Shadow.Raised)
             self.borda_inicio.setObjectName('frame')
             self.borda_inicio.setGeometry(QtCore.QRect(8, 25, 140, 29))
+
             self.data_inicio = QtWidgets.QDateEdit(parent=self.frame_personalisa)
             self.data_inicio.setGeometry(QtCore.QRect(10, 30, 130, 20))
             self.data_inicio.setDateTime(ccurrent_datetime)
             self.data_inicio.setCalendarPopup(True)
             self.data_inicio.setStyleSheet('border_color: #FFFFFF; border-radius: 10px; background-color: #FFFFFF;')
             self.data_inicio.setObjectName('data_inicio')
+
             self.inicio = QtWidgets.QLabel('Depois de ', self.frame_personalisa)
             self.inicio.setStyleSheet('font-size: 13px; margin: 0; padding: 0;border: none; background-color: #FFFFFF')
             self.inicio.setGeometry(15, 20, 63, 13)
+
             self.borda_fim = QtWidgets.QFrame(parent=self.frame_personalisa)
             self.borda_fim.setStyleSheet('border: 2px solid black; border-radius: 10px; background-color: #FFFFFF;')
             self.borda_fim.setFrameShape(QtWidgets.QFrame.Shape.StyledPanel)
             self.borda_fim.setFrameShadow(QtWidgets.QFrame.Shadow.Raised)
             self.borda_fim.setObjectName('frame')
             self.borda_fim.setGeometry(QtCore.QRect(8, 80, 140, 29))
+
             self.data_final = QtWidgets.QDateEdit(parent=self.frame_personalisa)
             self.data_final.setGeometry(QtCore.QRect(10, 85, 130, 20))
             self.data_final.setStyleSheet('border_color: #FFFFFF; border-radius: 10px; background-color: #FFFFFF;')
             self.data_final.setDateTime(QtCore.QDateTime.currentDateTime())
             self.data_final.setCalendarPopup(True)
             self.data_final.setObjectName('data_inicio')
+
             self.fim = QtWidgets.QLabel('Antes de ', self.frame_personalisa)
             self.fim.setStyleSheet('font-size: 13px; margin: 0; padding: 0;border: none; background-color: #FFFFFF')
             self.fim.setGeometry(15, 75, 57, 13)
+
             self.aplicar = QtWidgets.QPushButton('Aplicar', parent=self.frame_personalisa)
             self.aplicar.setGeometry(QtCore.QRect(165, 100, 101, 23))
             self.aplicar.clicked.connect(lambda: self.filtros(6))
             self.aplicar.setStyleSheet('QPushButton {\n                border: 2px solid #000000;\n                border-radius: 10px;\n                background-color: #FFFFFF;\n                color: #2E3D48;\n            }\n            QPushButton:pressed {\n                background-color: #2E3D48;\n                color: #FFFFFF;\n            }')
+
             self.labeltitulo.setGeometry(QtCore.QRect(540, 29, 400, 31))
             self.editbarra.setGeometry(QtCore.QRect(30, 65, 360, 21))
             self.btn_filtros.setGeometry(QtCore.QRect(420, 65, 150, 23))
@@ -494,54 +584,66 @@ class Ui_Demanda(QtWidgets.QMainWindow):
             self.btngraficos.clicked.connect(lambda: self.abrir_gráficos(MainWindow))
             self.btnsair.setGeometry(QtCore.QRect(315, 0, 100, 23))
             self.retranslateUi_ps(MainWindow)
-            self.atualiza_ps('tabela_demanda_ps')
+
+            self.atualiza_tabela_demandas('tabela_demanda_ps')
             self.temporizador(MainWindow)
         if self.dept == 'Pronto Socorro':
             self.procura_pac.hide()
             self.btngraficos.hide()
+
             self.btngraficos.setGeometry(QtCore.QRect(210, 0, 100, 23))
             self.btnsair.setGeometry(QtCore.QRect(105, 0, 100, 23))
             self.editbarra.setGeometry(QtCore.QRect(30, 100, 291, 21))
             self.labeltitulo.setGeometry(QtCore.QRect(540, 29, 400, 31))
+
             self.btnregis = QtWidgets.QPushButton(parent=self.frame)
             self.btnregis.setGeometry(QtCore.QRect(self.btn_width, 123, 131, 31))
             self.btnregis.setObjectName('btnregis')
             self.btnregis.clicked.connect(lambda: self.abrir_cadastro(MainWindow))
             self.btnregis.setStyleSheet('\n                        QPushButton {\n                            border: 2px solid #2E3D48;\n                            border-radius: 10px;\n                            background-color: #FFFFFF;\n                            color: #2E3D48;\n                        }\n                        QPushButton:pressed {\n                            background-color: #2E3D48;\n                            color: #FFFFFF;\n                        }\n                    ')
+
             self.btnalterar = QtWidgets.QPushButton(parent=self.frame)
             self.btnalterar.setGeometry(QtCore.QRect(self.btn_width, 160, 131, 31))
             self.btnalterar.setObjectName('btnalterar')
             self.btnalterar.clicked.connect(self.altera_table)
             self.btnalterar.setStyleSheet('\n                        QPushButton {\n                            border: 2px solid #2E3D48;\n                            border-radius: 10px;\n                            background-color: #FFFFFF;\n                            color: #2E3D48;\n                        }\n                        QPushButton:pressed {\n                            background-color: #2E3D48;\n                            color: #FFFFFF;\n                        }\n                    ')
             self.editable = False
+
             self.btnexclu = QtWidgets.QPushButton(parent=self.frame)
             self.btnexclu.setGeometry(QtCore.QRect(self.btn_width, 200, 131, 31))
             self.btnexclu.setObjectName('btnexclu')
             self.btnexclu.clicked.connect(self.excluir_demanda)
             self.btnexclu.setStyleSheet('\n                        QPushButton {\n                            border: 2px solid #2E3D48;\n                            border-radius: 10px;\n                            background-color: #FFFFFF;\n                            color: #2E3D48;\n                        }\n                        QPushButton:pressed {\n                            background-color: #2E3D48;\n                            color: #FFFFFF;\n                        }\n                    ')
+
             self.retranslateUi_ps(MainWindow)
-            self.atualiza_ps('tabela_demanda_ps')
+            self.atualiza_tabela_demandas('tabela_demanda_ps')
         if self.dept == 'Bloco Cirúrgico':
             self.procura_pac.hide()
             self.btngraficos.hide()
+
             self.btnsair.setGeometry(QtCore.QRect(105, 0, 100, 23))
             self.editbarra.setGeometry(QtCore.QRect(30, 100, 291, 21))
             self.labeltitulo.setGeometry(QtCore.QRect(540, 29, 400, 31))
+
             self.temporizador(MainWindow)
             self.abrir_tabela_Agenda_Bloco(MainWindow)
+
             self.btndeman.clicked.connect(lambda: self.abrir_tabela_Agenda_Bloco(MainWindow))
+
             self.btnregis = QtWidgets.QPushButton('REGISTRAR DEMANDA', parent=self.frame)
             self.btnregis.setGeometry(QtCore.QRect(self.btn_width, 123, 131, 31))
             self.btnregis.setObjectName('btnregis')
             self.btnregis.clicked.connect(lambda: self.abrir_cadastro(MainWindow))
             self.btnregis.setStyleSheet('\n                                    QPushButton {\n                                        border: 2px solid #2E3D48;\n                                        border-radius: 10px;\n                                        background-color: #FFFFFF;\n                                        color: #2E3D48;\n                                    }\n                                    QPushButton:pressed {\n                                        background-color: #2E3D48;\n                                        color: #FFFFFF;\n                                    }\n                                ')
             self.btnregis.clicked.connect(lambda: self.abrir_cadastro(MainWindow))
+
             self.btnalterar = QtWidgets.QPushButton('ALTERAR DEMANDA', parent=self.frame)
             self.btnalterar.setGeometry(QtCore.QRect(self.btn_width, 160, 131, 31))
             self.btnalterar.setObjectName('btnalterar')
             self.btnalterar.clicked.connect(self.altera_table)
             self.btnalterar.setStyleSheet('\n                                    QPushButton {\n                                        border: 2px solid #2E3D48;\n                                        border-radius: 10px;\n                                        background-color: #FFFFFF;\n                                        color: #2E3D48;\n                                    }\n                                    QPushButton:pressed {\n                                        background-color: #2E3D48;\n                                        color: #FFFFFF;\n                                    }\n                                ')
             self.editable = False
+
             self.btnexclu = QtWidgets.QPushButton('EXCLUIR DEMANDA', parent=self.frame)
             self.btnexclu.setGeometry(QtCore.QRect(self.btn_width, 200, 131, 31))
             self.btnexclu.setObjectName('btnexclu')
@@ -554,6 +656,7 @@ class Ui_Demanda(QtWidgets.QMainWindow):
             self.btn_confirm_alta.clicked.connect(self.confirm_alta)
             self.btn_confirm_alta.setGeometry(QtCore.QRect())
             self.btn_confirm_alta.setStyleSheet('\n                        QPushButton {\n                            border: 2px solid #2E3D48;\n                            border-radius: 10px;\n                            background-color: #FFFFFF;\n                            color: #2E3D48;\n                        }\n                        QPushButton:pressed {\n                            background-color: #2E3D48;\n                            color: #FFFFFF;\n                        }')
+
             self.procura_pac.hide()
             self.btngraficos.hide()
             self.btnsair.setGeometry(QtCore.QRect(105, 0, 100, 23))
@@ -561,18 +664,21 @@ class Ui_Demanda(QtWidgets.QMainWindow):
             self.labeltitulo.setGeometry(QtCore.QRect(540, 29, 400, 31))
             self.temporizador(MainWindow)
             self.abrir_tabela_Alta_CTI(MainWindow)
+
             self.btnregis = QtWidgets.QPushButton('REGISTRAR DEMANDA', parent=self.frame)
             self.btnregis.setGeometry(QtCore.QRect(self.btn_width, 123, 131, 31))
             self.btnregis.setObjectName('btnregis')
             self.btnregis.clicked.connect(lambda: self.abrir_cadastro(MainWindow))
             self.btnregis.setStyleSheet('\n                                    QPushButton {\n                                        border: 2px solid #2E3D48;\n                                        border-radius: 10px;\n                                        background-color: #FFFFFF;\n                                        color: #2E3D48;\n                                    }\n                                    QPushButton:pressed {\n                                        background-color: #2E3D48;\n                                        color: #FFFFFF;\n                                    }\n                                ')
             self.btnregis.clicked.connect(lambda: self.abrir_cadastro(MainWindow))
+
             self.btnalterar = QtWidgets.QPushButton('ALTERAR DEMANDA', parent=self.frame)
             self.btnalterar.setGeometry(QtCore.QRect(self.btn_width, 160, 131, 31))
             self.btnalterar.setObjectName('btnalterar')
             self.btnalterar.clicked.connect(self.altera_table)
             self.btnalterar.setStyleSheet('\n                                    QPushButton {\n                                        border: 2px solid #2E3D48;\n                                        border-radius: 10px;\n                                        background-color: #FFFFFF;\n                                        color: #2E3D48;\n                                    }\n                                    QPushButton:pressed {\n                                        background-color: #2E3D48;\n                                        color: #FFFFFF;\n                                    }\n                                ')
             self.editable = False
+
             self.btnexclu = QtWidgets.QPushButton('EXCLUIR DEMANDA', parent=self.frame)
             self.btnexclu.setGeometry(QtCore.QRect(self.btn_width, 200, 131, 31))
             self.btnexclu.setObjectName('btnexclu')
@@ -581,23 +687,27 @@ class Ui_Demanda(QtWidgets.QMainWindow):
         if self.dept == 'Hemodinâmica':
             self.procura_pac.hide()
             self.btngraficos.hide()
+
             self.btnsair.setGeometry(QtCore.QRect(105, 0, 100, 23))
             self.editbarra.setGeometry(QtCore.QRect(30, 100, 291, 21))
             self.labeltitulo.setGeometry(QtCore.QRect(540, 29, 400, 31))
             self.temporizador(MainWindow)
             self.abrir_tabela_Hemodinamica(MainWindow)
+
             self.btnregis = QtWidgets.QPushButton('REGISTRAR DEMANDA', parent=self.frame)
             self.btnregis.setGeometry(QtCore.QRect(self.btn_width, 123, 131, 31))
             self.btnregis.setObjectName('btnregis')
             self.btnregis.clicked.connect(lambda: self.abrir_cadastro(MainWindow))
             self.btnregis.setStyleSheet('\n                        QPushButton {\n                            border: 2px solid #2E3D48;\n                            border-radius: 10px;\n                            background-color: #FFFFFF;\n                            color: #2E3D48;\n                        }\n                        QPushButton:pressed {\n                            background-color: #2E3D48;\n                            color: #FFFFFF;\n                        }\n                    ')
             self.btnregis.clicked.connect(lambda: self.abrir_cadastro(MainWindow))
+
             self.btnalterar = QtWidgets.QPushButton('ALTERAR DEMANDA', parent=self.frame)
             self.btnalterar.setGeometry(QtCore.QRect(self.btn_width, 160, 131, 31))
             self.btnalterar.setObjectName('btnalterar')
             self.btnalterar.clicked.connect(self.altera_table)
             self.btnalterar.setStyleSheet('\n                        QPushButton {\n                            border: 2px solid #2E3D48;\n                            border-radius: 10px;\n                            background-color: #FFFFFF;\n                            color: #2E3D48;\n                        }\n                        QPushButton:pressed {\n                            background-color: #2E3D48;\n                            color: #FFFFFF;\n                        }\n                    ')
             self.editable = False
+
             self.btnexclu = QtWidgets.QPushButton('EXCLUIR DEMANDA', parent=self.frame)
             self.btnexclu.setGeometry(QtCore.QRect(self.btn_width, 200, 131, 31))
             self.btnexclu.setObjectName('btnexclu')
@@ -607,61 +717,72 @@ class Ui_Demanda(QtWidgets.QMainWindow):
             self.labeltitulo.setGeometry(QtCore.QRect(540, 29, 400, 31))
             self.btngraficos.setGeometry(QtCore.QRect(210, 0, 100, 23))
             self.btnsair.setGeometry(QtCore.QRect(320, 0, 100, 23))
+
             self.btn_grade = QtWidgets.QPushButton(parent=self.frame)
             self.btn_grade.setGeometry(QtCore.QRect(105, 0, 100, 23))
             self.btn_grade.setObjectName('Grade')
             self.btn_grade.setText(_translate('MainWindow', 'GRADE'))
             self.btn_grade.clicked.connect(lambda: self.abrir_grade(MainWindow))
             self.btn_grade.setStyleSheet('\n                        QPushButton {\n                            border: 2px solid #2E3D48;\n                            border-radius: 10px;\n                            background-color: #FFFFFF;\n                            color: #2E3D48;\n                        }\n                        QPushButton:pressed {\n                            background-color: #2E3D48;\n                            color: #FFFFFF;\n                        }\n                    ')
+
             self.btn_PRONTO_SOCORRO = QtWidgets.QPushButton(parent=self.frame)
             self.btn_PRONTO_SOCORRO.setGeometry(QtCore.QRect(0, 100, 120, 23))
             self.btn_PRONTO_SOCORRO.setObjectName('btn_PRONTO_SOCORRO')
             self.btn_PRONTO_SOCORRO.setText(_translate('MainWindow', 'PRONTO SOCORRO'))
             self.btn_PRONTO_SOCORRO.clicked.connect(lambda: self.setupUi(MainWindow, self.dept, self.user, self.nome_user))
             self.btn_PRONTO_SOCORRO.setStyleSheet('\n                        QPushButton {\n                            border: 2px solid #2E3D48;\n                            border-radius: 10px;\n                            background-color: #FFFFFF;\n                            color: #2E3D48;\n                        }\n                        QPushButton:pressed {\n                            background-color: #2E3D48;\n                            color: #FFFFFF;\n                        }\n                    ')
+
             self.frame.mousePressEvent = lambda event: self.toggle_frame_visibility(self.sidebar)
+
             self.btn_ALTAS_CTI = QtWidgets.QPushButton(parent=self.frame)
             self.btn_ALTAS_CTI.setGeometry(QtCore.QRect(125, 100, 100, 23))
             self.btn_ALTAS_CTI.setObjectName('btn_ALTAS_CTI')
             self.btn_ALTAS_CTI.setText(_translate('MainWindow', "ALTA CTI'S"))
             self.btn_ALTAS_CTI.clicked.connect(lambda: self.abrir_tabela_Alta_CTI(MainWindow))
             self.btn_ALTAS_CTI.setStyleSheet('\n                        QPushButton {\n                            border: 2px solid #2E3D48;\n                            border-radius: 10px;\n                            background-color: #FFFFFF;\n                            color: #2E3D48;\n                        }\n                        QPushButton:pressed {\n                            background-color: #2E3D48;\n                            color: #FFFFFF;\n                        }\n                    ')
+
             self.btn_AGENDA_BLOCO = QtWidgets.QPushButton(parent=self.frame)
             self.btn_AGENDA_BLOCO.setGeometry(QtCore.QRect(230, 100, 100, 23))
             self.btn_AGENDA_BLOCO.setObjectName('btn_AGENDA_BLOCO')
             self.btn_AGENDA_BLOCO.setText(_translate('MainWindow', 'AGENDA BLOCO'))
             self.btn_AGENDA_BLOCO.clicked.connect(lambda: self.abrir_tabela_Agenda_Bloco(MainWindow))
             self.btn_AGENDA_BLOCO.setStyleSheet('\n                        QPushButton {\n                            border: 2px solid #2E3D48;\n                            border-radius: 10px;\n                            background-color: #FFFFFF;\n                            color: #2E3D48;\n                        }\n                        QPushButton:pressed {\n                            background-color: #2E3D48;\n                            color: #FFFFFF;\n                        }\n                    ')
+
             self.btn_HEMODINÂMICA = QtWidgets.QPushButton(parent=self.frame)
             self.btn_HEMODINÂMICA.setGeometry(QtCore.QRect(335, 100, 100, 23))
             self.btn_HEMODINÂMICA.setObjectName('btn_HEMODINÂMICA')
             self.btn_HEMODINÂMICA.setText(_translate('MainWindow', 'HEMODINÂMICA'))
             self.btn_HEMODINÂMICA.clicked.connect(lambda: self.abrir_tabela_Hemodinamica(MainWindow))
             self.btn_HEMODINÂMICA.setStyleSheet('\n                        QPushButton {\n                            border: 2px solid #2E3D48;\n                            border-radius: 10px;\n                            background-color: #FFFFFF;\n                            color: #2E3D48;\n                        }\n                        QPushButton:pressed {\n                            background-color: #2E3D48;\n                            color: #FFFFFF;\n                        }\n                    ')
+
             self.btn_INTER_TRAN_EXTE = QtWidgets.QPushButton(parent=self.frame)
             self.btn_INTER_TRAN_EXTE.setGeometry(QtCore.QRect(440, 100, 200, 23))
             self.btn_INTER_TRAN_EXTE.setObjectName('btn_INTER_TRAN_EXTE')
             self.btn_INTER_TRAN_EXTE.setText(_translate('MainWindow', 'INTERNAÇÕES E TRANSF. EXTERNAS'))
             self.btn_INTER_TRAN_EXTE.clicked.connect(lambda: self.abrir_tabela_Inter_Tran_Exte(MainWindow))
             self.btn_INTER_TRAN_EXTE.setStyleSheet('\n                        QPushButton {\n                            border: 2px solid #2E3D48;\n                            border-radius: 10px;\n                            background-color: #FFFFFF;\n                            color: #2E3D48;\n                        }\n                        QPushButton:pressed {\n                            background-color: #2E3D48;\n                            color: #FFFFFF;\n                        }\n                    ')
+
             self.btn_TRANS_INT = QtWidgets.QPushButton(parent=self.frame)
             self.btn_TRANS_INT.setGeometry(QtCore.QRect(645, 100, 160, 23))
             self.btn_TRANS_INT.setObjectName('btn_TRANS_INT')
             self.btn_TRANS_INT.setText(_translate('MainWindow', 'TRANSFERÊNCIAS INTERNAS'))
             self.btn_TRANS_INT.clicked.connect(lambda: self.abrir_tabela_Tran_Inte(MainWindow))
             self.btn_TRANS_INT.setStyleSheet('\n                        QPushButton {\n                            border: 2px solid #2E3D48;\n                            border-radius: 10px;\n                            background-color: #FFFFFF;\n                            color: #2E3D48;\n                        }\n                        QPushButton:pressed {\n                            background-color: #2E3D48;\n                            color: #FFFFFF;\n                        }\n                    ')
+
             self.btn_ONCO_HEMATO_PED = QtWidgets.QPushButton(parent=self.frame)
             self.btn_ONCO_HEMATO_PED.setGeometry(QtCore.QRect(810, 100, 130, 23))
             self.btn_ONCO_HEMATO_PED.setObjectName('btn_ONCO_HEMATO_PED')
             self.btn_ONCO_HEMATO_PED.setText(_translate('MainWindow', 'ONCO HEMATO PED'))
             self.btn_ONCO_HEMATO_PED.clicked.connect(lambda: self.abrir_tabela_Onco_Hemato_Ped(MainWindow))
             self.btn_ONCO_HEMATO_PED.setStyleSheet('\n                        QPushButton {\n                            border: 2px solid #2E3D48;\n                            border-radius: 10px;\n                            background-color: #FFFFFF;\n                            color: #2E3D48;\n                        }\n                        QPushButton:pressed {\n                            background-color: #2E3D48;\n                            color: #FFFFFF;\n                        }\n                    ')
+
             self.frame_personalisa = QtWidgets.QFrame(parent=self.frame)
             self.frame_personalisa.setStyleSheet('\n                                            QFrame  {\n                                                background-color: #FFFFFF;\n                                                border-top-right-radius: 20px;\n                                                border-bottom-right-radius: 20px;\n                                                border-left: 1px solid black;\n                                            }\n                                        ')
             self.frame_personalisa.setFrameShape(QtWidgets.QFrame.Shape.StyledPanel)
             self.frame_personalisa.setFrameShadow(QtWidgets.QFrame.Shadow.Raised)
             self.frame_personalisa.setObjectName('frame_box')
             self.frame_personalisa.hide()
+
             self.btn_filtros = QtWidgets.QPushButton('▼ Selecione uma Data ', parent=self.frame)
             self.btnfechar = QtWidgets.QPushButton(' X ', parent=self.frame)
             self.btn_filtros.setFocus()
@@ -669,28 +790,36 @@ class Ui_Demanda(QtWidgets.QMainWindow):
             current_datetime = QDateTime.currentDateTime()
             formatted_date = current_datetime.toString('yyyy')
             formatted_date2 = current_datetime.addYears(-1).toString('yyyy')
+
             self.frame_box = QtWidgets.QFrame(parent=self.frame)
             self.frame_box.setStyleSheet('border: 2px solid white; border-radius: 10px; background-color: white;')
             self.frame_box.setFrameShape(QtWidgets.QFrame.Shape.StyledPanel)
             self.frame_box.setFrameShadow(QtWidgets.QFrame.Shadow.Raised)
             colo = '\n                                                    QPushButton {\n\n                                                    background-color: #FFFFFF;\n                                                    color: #2E3D48;\n                                                    border-radius: 10px;\n                                                    border-color: transparent;\n                                                    }\n                                                    QPushButton:hover {\n                                                    background-color: #c0c0c0;\n                                                    color: #000000;\n                                                    }\n                                                    QPushButton:pressed {\n                                                        background-color: #2E3D48;\n                                                        color: #FFFFFF;\n                                                    }\n                                                '
+
             self.btn_hoje = QtWidgets.QPushButton('Hoje', self.frame_box)
             self.btn_hoje.setGeometry(QtCore.QRect(0, 0, 150, 20))
             self.btn_hoje.setStyleSheet(colo)
+
             self.btn_7 = QtWidgets.QPushButton('Últimos 7 dias', self.frame_box)
             self.btn_7.setGeometry(QtCore.QRect(0, 20, 150, 20))
             self.btn_7.setStyleSheet(colo)
+
             self.btn_30 = QtWidgets.QPushButton('Últimos 30 dias', self.frame_box)
             self.btn_30.setGeometry(QtCore.QRect(0, 40, 150, 20))
             self.btn_30.setStyleSheet(colo)
+
             self.btn_ano = QtWidgets.QPushButton(f'{formatted_date}', self.frame_box)
             self.btn_ano.setGeometry(QtCore.QRect(0, 60, 150, 20))
             self.btn_ano.setStyleSheet(colo)
+
             self.btn_2ano = QtWidgets.QPushButton(f'{formatted_date2}', self.frame_box)
             self.btn_2ano.setGeometry(QtCore.QRect(0, 80, 150, 20))
             self.btn_2ano.setStyleSheet(colo)
+
             self.btn_personalisa = QtWidgets.QPushButton('Período personalizado >', self.frame_box)
             self.btn_personalisa.setStyleSheet(colo)
+
             self.btn_filtros.clicked.connect(self.abrir_items)
             self.btn_7.clicked.connect(lambda: self.filtros(2))
             self.btn_30.clicked.connect(lambda: self.filtros(3))
@@ -701,9 +830,12 @@ class Ui_Demanda(QtWidgets.QMainWindow):
             self.btn_personalisa.clicked.connect(self.abrir_personalisa)
             self.btn_personalisa.setGeometry(QtCore.QRect(0, 100, 150, 20))
             self.day = 'ONTEM'
+
             self.btnfechar.hide()
             self.frame_box.hide()
+
             self.btn_filtros.setStyleSheet('QPushButton {\n                border: 2px solid #2E3D48;\n                border-radius: 10px;\n                background-color: #FFFFFF;\n                color: #2E3D48;\n            }\n            QPushButton:pressed {\n                background-color: #2E3D48;\n                color: #FFFFFF;\n            }')
+
             ccurrent_datetime = QtCore.QDateTime.currentDateTime()
             self.borda_inicio = QtWidgets.QFrame(parent=self.frame_personalisa)
             self.borda_inicio.setStyleSheet('border: 2px solid black; border-radius: 10px; background-color: #FFFFFF;')
@@ -711,34 +843,41 @@ class Ui_Demanda(QtWidgets.QMainWindow):
             self.borda_inicio.setFrameShadow(QtWidgets.QFrame.Shadow.Raised)
             self.borda_inicio.setObjectName('frame')
             self.borda_inicio.setGeometry(QtCore.QRect(8, 25, 140, 29))
+
             self.data_inicio = QtWidgets.QDateEdit(parent=self.frame_personalisa)
             self.data_inicio.setGeometry(QtCore.QRect(10, 30, 130, 20))
             self.data_inicio.setDateTime(ccurrent_datetime)
             self.data_inicio.setCalendarPopup(True)
             self.data_inicio.setStyleSheet('border_color: #FFFFFF; border-radius: 10px; background-color: #FFFFFF;')
             self.data_inicio.setObjectName('data_inicio')
+
             self.inicio = QtWidgets.QLabel('Depois de ', self.frame_personalisa)
             self.inicio.setStyleSheet('font-size: 13px; margin: 0; padding: 0;border: none; background-color: #FFFFFF')
             self.inicio.setGeometry(15, 20, 63, 13)
+
             self.borda_fim = QtWidgets.QFrame(parent=self.frame_personalisa)
             self.borda_fim.setStyleSheet('border: 2px solid black; border-radius: 10px; background-color: #FFFFFF;')
             self.borda_fim.setFrameShape(QtWidgets.QFrame.Shape.StyledPanel)
             self.borda_fim.setFrameShadow(QtWidgets.QFrame.Shadow.Raised)
             self.borda_fim.setObjectName('frame')
             self.borda_fim.setGeometry(QtCore.QRect(8, 80, 140, 29))
+
             self.data_final = QtWidgets.QDateEdit(parent=self.frame_personalisa)
             self.data_final.setGeometry(QtCore.QRect(10, 85, 130, 20))
             self.data_final.setStyleSheet('border_color: #FFFFFF; border-radius: 10px; background-color: #FFFFFF;')
             self.data_final.setDateTime(QtCore.QDateTime.currentDateTime())
             self.data_final.setCalendarPopup(True)
             self.data_final.setObjectName('data_inicio')
+
             self.fim = QtWidgets.QLabel('Antes de ', self.frame_personalisa)
             self.fim.setStyleSheet('font-size: 13px; margin: 0; padding: 0;border: none; background-color: #FFFFFF')
             self.fim.setGeometry(15, 75, 57, 13)
+
             self.aplicar = QtWidgets.QPushButton('Aplicar', parent=self.frame_personalisa)
             self.aplicar.setGeometry(QtCore.QRect(165, 100, 101, 23))
             self.aplicar.clicked.connect(lambda: self.filtros(6))
             self.aplicar.setStyleSheet('QPushButton {\n                border: 2px solid #000000;\n                border-radius: 10px;\n                background-color: #FFFFFF;\n                color: #2E3D48;\n            }\n            QPushButton:pressed {\n                background-color: #2E3D48;\n                color: #FFFFFF;\n            }')
+
             self.labeltitulo.setGeometry(QtCore.QRect(540, 29, 400, 31))
             self.editbarra.setGeometry(QtCore.QRect(30, 65, 360, 21))
             self.btn_filtros.setGeometry(QtCore.QRect(420, 65, 150, 23))
@@ -747,8 +886,9 @@ class Ui_Demanda(QtWidgets.QMainWindow):
             self.frame_box.setGeometry(QtCore.QRect(420, 89, 150, 125))
             self.btngraficos.setGeometry(QtCore.QRect(210, 0, 100, 23))
             self.btngraficos.clicked.connect(lambda: self.abrir_gráficos(MainWindow))
+
             self.retranslateUi_ps(MainWindow)
-            self.atualiza_ps('tabela_demanda_ps')
+            self.atualiza_tabela_demandas('tabela_demanda_ps')
         self.conf_layout()
         self.temporizador(MainWindow)
         if not self.frame_do_grafico.isHidden():
@@ -824,20 +964,21 @@ class Ui_Demanda(QtWidgets.QMainWindow):
         if self.day != 'ONTEM':
             self.filtrar_data()
             return
+
         if self.variavel == 0:
-            self.atualiza_ps('tabela_demanda_ps')
+            self.atualiza_tabela_demandas('tabela_demanda_ps')
         if self.variavel == 1:
-            self.atualiza_ps('alta_cti')
+            self.atualiza_tabela_demandas('alta_cti')
         if self.variavel == 2:
-            self.atualiza_ps('tabela_agenda_bloco_demanda')
+            self.atualiza_tabela_demandas('tabela_agenda_bloco_demanda')
         if self.variavel == 3:
-            self.atualiza_ps('tabela_hemodinamica')
+            self.atualiza_tabela_demandas('tabela_hemodinamica')
         if self.variavel == 4:
-            self.atualiza_ps('tabela_internações_e_transf_externas')
+            self.atualiza_tabela_demandas('tabela_internações_e_transf_externas')
         if self.variavel == 5:
-            self.atualiza_ps('tabela_transferencias_internas')
+            self.atualiza_tabela_demandas('tabela_transferencias_internas')
         if self.variavel == 6:
-            self.atualiza_ps('tabela_onco_hemato_ped')
+            self.atualiza_tabela_demandas('tabela_onco_hemato_ped')
         self.timer_ps.start()
 
     def abrir_personalisa(self):
@@ -974,14 +1115,14 @@ class Ui_Demanda(QtWidgets.QMainWindow):
                     conexao.close()
         cursor.close()
         conexao.close()
-        self.atualiza_ps('alta_cti')
+        self.atualiza_tabela_demandas('alta_cti')
 
     def abrir_tabela_Onco_Hemato_Ped(self, MainWindow):
         if self.dept != 'Telespectador' and self.dept != 'Bloco Cirúrgico' and (self.dept != 'Pronto Socorro') and (self.dept != 'Hemodinâmica'):
             self.btn_confirm_alta.hide()
 
         if self.dept == 'NIR':
-            self.alterar_cor_tel()
+            self.alterar_cor_tela()
         self.tabelademan.setColumnCount(18)
         self.tabelademan.setRowCount(0)
         self.variavel = 6
@@ -1044,7 +1185,7 @@ class Ui_Demanda(QtWidgets.QMainWindow):
         item.setFont(font)
         self.tabelademan.setHorizontalHeaderItem(17, item)
         self.retranslateUi_onco_hemato_ped(MainWindow)
-        self.atualiza_ps('tabela_onco_hemato_ped')
+        self.atualiza_tabela_demandas('tabela_onco_hemato_ped')
         self.tabelademan.setCurrentCell(self.tabelademan.rowCount() - 1, 0)
         if not self.frame_do_grafico.isHidden():
             self.canvas.show()
@@ -1056,7 +1197,7 @@ class Ui_Demanda(QtWidgets.QMainWindow):
             self.btn_confirm_alta.hide()
 
         if self.dept == 'NIR':
-            self.alterar_cor_tel()
+            self.alterar_cor_tela()
         self.tabelademan.setColumnCount(13)
         self.tabelademan.setRowCount(0)
         self.variavel = 5
@@ -1084,7 +1225,7 @@ class Ui_Demanda(QtWidgets.QMainWindow):
         item.setFont(font)
         self.tabelademan.setHorizontalHeaderItem(12, item)
         self.retranslateUi_tran_inte(MainWindow)
-        self.atualiza_ps('tabela_transferencias_internas')
+        self.atualiza_tabela_demandas('tabela_transferencias_internas')
         self.tabelademan.setCurrentCell(self.tabelademan.rowCount() - 1, 0)
         if not self.frame_do_grafico.isHidden():
             self.canvas.show()
@@ -1095,7 +1236,7 @@ class Ui_Demanda(QtWidgets.QMainWindow):
         if self.dept != 'Telespectador' and self.dept != 'Bloco Cirúrgico' and (self.dept != 'Pronto Socorro') and (self.dept != 'Hemodinâmica'):
             self.btn_confirm_alta.hide()
         if self.dept == 'NIR':
-            self.alterar_cor_tel()
+            self.alterar_cor_tela()
         self.tabelademan.setColumnCount(17)
         self.tabelademan.setRowCount(0)
         self.variavel = 4
@@ -1151,7 +1292,7 @@ class Ui_Demanda(QtWidgets.QMainWindow):
         item.setFont(font)
         self.tabelademan.setHorizontalHeaderItem(16, item)
         self.retranslateUi_inter_tran_exte(MainWindow)
-        self.atualiza_ps('tabela_internações_e_transf_externas')
+        self.atualiza_tabela_demandas('tabela_internações_e_transf_externas')
         self.tabelademan.setCurrentCell(self.tabelademan.rowCount() - 1, 0)
         if not self.frame_do_grafico.isHidden():
             self.canvas.show()
@@ -1162,7 +1303,7 @@ class Ui_Demanda(QtWidgets.QMainWindow):
         if self.dept != 'Telespectador' and self.dept != 'Bloco Cirúrgico' and (self.dept != 'Pronto Socorro') and (self.dept != 'Hemodinâmica'):
             self.btn_confirm_alta.hide()
         if self.dept == 'NIR':
-            self.alterar_cor_tel()
+            self.alterar_cor_tela()
         self.tabelademan.setColumnCount(18)
         self.tabelademan.setRowCount(0)
         self.variavel = 3
@@ -1225,7 +1366,7 @@ class Ui_Demanda(QtWidgets.QMainWindow):
         item.setFont(font)
         self.tabelademan.setHorizontalHeaderItem(17, item)
         self.retranslateUi_hemodinamica(MainWindow)
-        self.atualiza_ps('tabela_hemodinamica')
+        self.atualiza_tabela_demandas('tabela_hemodinamica')
         self.tabelademan.setCurrentCell(self.tabelademan.rowCount() - 1, 0)
         if not self.frame_do_grafico.isHidden():
             self.canvas.show()
@@ -1236,7 +1377,7 @@ class Ui_Demanda(QtWidgets.QMainWindow):
         if self.dept != 'Telespectador' and self.dept != 'Bloco Cirúrgico' and (self.dept != 'Pronto Socorro') and (self.dept != 'Hemodinâmica'):
             self.btn_confirm_alta.hide()
         if self.dept == 'NIR':
-            self.alterar_cor_tel()
+            self.alterar_cor_tela()
         self.variavel = 0
         self.tabelademan.setColumnCount(15)
         self.tabelademan.setRowCount(0)
@@ -1278,7 +1419,7 @@ class Ui_Demanda(QtWidgets.QMainWindow):
         item.setFont(font)
         self.tabelademan.setHorizontalHeaderItem(14, item)
         self.retranslateUi_ps(MainWindow)
-        self.atualiza_ps('tabela_demanda_ps')
+        self.atualiza_tabela_demandas('tabela_demanda_ps')
         self.tabelademan.setCurrentCell(self.tabelademan.rowCount() - 1, 0)
         if not self.frame_do_grafico.isHidden():
             self.canvas.show()
@@ -1289,7 +1430,7 @@ class Ui_Demanda(QtWidgets.QMainWindow):
         if self.dept != 'Telespectador' and self.dept != 'Bloco Cirúrgico' and (self.dept != 'Pronto Socorro') and (self.dept != 'Hemodinâmica'):
             self.btn_confirm_alta.hide()
         if self.dept == 'NIR':
-            self.alterar_cor_tel()
+            self.alterar_cor_tela()
         self.variavel = 2
         self.tabelademan.setColumnCount(19)
         self.tabelademan.setRowCount(0)
@@ -1359,7 +1500,7 @@ class Ui_Demanda(QtWidgets.QMainWindow):
         item.setFont(font)
         self.tabelademan.setHorizontalHeaderItem(18, item)
         self.retranslateUi_agenda_bloco(MainWindow)
-        self.atualiza_ps('tabela_agenda_bloco_demanda')
+        self.atualiza_tabela_demandas('tabela_agenda_bloco_demanda')
         self.tabelademan.setCurrentCell(self.tabelademan.rowCount() - 1, 0)
         if not self.frame_do_grafico.isHidden():
             self.canvas.show()
@@ -1370,8 +1511,8 @@ class Ui_Demanda(QtWidgets.QMainWindow):
         if self.dept != 'Telespectador':
             self.btn_confirm_alta.setGeometry(QtCore.QRect(self.btn_width, 285, 131, 31))
         if self.dept == 'NIR':
-            self.alterar_cor_tel()
-        self.tabelademan.setColumnCount(18)
+            self.alterar_cor_tela()
+        self.tabelademan.setColumnCount(19)
         self.tabelademan.setRowCount(0)
         self.variavel = 1
         item = QtWidgets.QTableWidgetItem()
@@ -1432,487 +1573,39 @@ class Ui_Demanda(QtWidgets.QMainWindow):
         font.setWeight(75)
         item.setFont(font)
         self.tabelademan.setHorizontalHeaderItem(17, item)
+        item = QtWidgets.QTableWidgetItem()
+        font = QtGui.QFont('Arial', 15, weight=QtGui.QFont.Weight.Bold)
+        font.setPointSize(8)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
+        self.tabelademan.setHorizontalHeaderItem(18, item)
         self.retranslateUi_alta_cti(MainWindow)
-        self.atualiza_ps('alta_cti')
+        self.atualiza_tabela_demandas('alta_cti')
         self.tabelademan.setCurrentCell(self.tabelademan.rowCount() - 1, 0)
         if not self.frame_do_grafico.isHidden():
             self.canvas.show()
             self.plot_pie_chart()
             self.timer.stop()
 
-    def atualiza_onco_hemato_ped(self):
-        conexao = mysql.connector.connect(host='10.36.0.32', user='sglHC2024', password='S4g1L81', database='sgl')
-        cursor = conexao.cursor()
-        comando = 'SELECT * FROM tabela_onco_hemato_ped'
-        cursor.execute(comando)
-        leitura = cursor.fetchall()
-        self.tabelademan.clearContents()
-        self.tabelademan.setRowCount(0)
-        for linha in leitura:
-            row = self.tabelademan.rowCount()
-            self.tabelademan.insertRow(row)
-            for column, valor in enumerate(linha):
-                item = QtWidgets.QTableWidgetItem(str(valor))
-                item.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-                if column != 0:
-                    if item is None or item.text() == 'None':
-                        item = QtWidgets.QTableWidgetItem(str(''))
-                        item.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-                    self.tabelademan.setItem(row, column, item)
-                if column == 0:
-                    self.tabelademan.setVerticalHeaderItem(row, item)
-                    _translate = QtCore.QCoreApplication.translate
-                    self.increase_column_width(0, 16)
-                    item_pac = self.tabelademan.verticalHeaderItem(row)
-                    item_pac.setText(_translate('MainWindow', item.text()))
-        for row in range(self.tabelademan.rowCount()):
-            for colum in range(self.tabelademan.columnCount()):
-                if self.tabelademan.item(row, colum) == 'DATA E HORA DA RESERVA':
-                    break
-            data_reserva = self.tabelademan.item(row, colum).text()
-            current_datetime = QDateTime.currentDateTime()
-            formatted_date = current_datetime.toString('dd/MM/yyyy')
-            excel_blue = QtGui.QColor(255, 255, 255)
-            adjusted_color = excel_blue.lighter(100)
-            data_celula = ''
-            if data_reserva and ' ' in data_reserva:
-                data_celula = data_reserva.split()[0]
-            if data_reserva == '':
-                for column in range(self.tabelademan.columnCount()):
-                    item = self.tabelademan.item(row, column)
-                    if item is not None:
-                        new_item = QtWidgets.QTableWidgetItem(item.text())
-                        excel_blue = QtGui.QColor(255, 255, 255)
-                        new_item.setBackground(excel_blue)
-                        new_item.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-                        self.tabelademan.setItem(row, column, new_item)
-            else:
-                if formatted_date == data_celula:
-                    for column in range(self.tabelademan.columnCount()):
-                        item = self.tabelademan.item(row, column)
-                        if item is None:
-                            continue
-                        new_item = QtWidgets.QTableWidgetItem(item.text())
-                        excel_blue = QtGui.QColor(31, 73, 125)
-                        adjusted_color = excel_blue.lighter(140)
-                        new_item.setBackground(adjusted_color)
-                        new_item.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-                        self.tabelademan.setItem(row, column, new_item)
-                if data_celula < formatted_date:
-                    for column in range(self.tabelademan.columnCount()):
-                        item = self.tabelademan.item(row, column)
-                        if item is None:
-                            continue
-                        new_item = QtWidgets.QTableWidgetItem(item.text())
-                        excel_blue = QtGui.QColor(255, 148, 74)
-                        adjusted_color = excel_blue.lighter(140)
-                        new_item.setBackground(adjusted_color)
-                        new_item.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-                        self.tabelademan.setItem(row, column, new_item)
-            selecao = QtWidgets.QTableWidgetItem()
-            selecao.setFlags(QtCore.Qt.ItemFlag.ItemIsUserCheckable | QtCore.Qt.ItemFlag.ItemIsEnabled)
-            selecao.setCheckState(QtCore.Qt.CheckState.Unchecked)
-            selecao.setBackground(QtGui.QBrush(adjusted_color))
-            self.tabelademan.setItem(row, 0, selecao)
-        cursor.close()
-        conexao.close()
-
-    def atualiza_transferencias_internas(self):
-        conexao = mysql.connector.connect(host='10.36.0.32', user='sglHC2024', password='S4g1L81', database='sgl')
-        cursor = conexao.cursor()
-        comando = 'SELECT * FROM tabela_transferencias_internas'
-        cursor.execute(comando)
-        leitura = cursor.fetchall()
-        self.tabelademan.clearContents()
-        self.tabelademan.setRowCount(0)
-        for linha in leitura:
-            row = self.tabelademan.rowCount()
-            self.tabelademan.insertRow(row)
-            for column, valor in enumerate(linha):
-                item = QtWidgets.QTableWidgetItem(str(valor))
-                item.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-                if column != 0:
-                    if item is None or item.text() == 'None':
-                        item = QtWidgets.QTableWidgetItem(str(''))
-                        item.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-                    self.tabelademan.setItem(row, column, item)
-                if column == 0:
-                    self.tabelademan.setVerticalHeaderItem(row, item)
-                    _translate = QtCore.QCoreApplication.translate
-                    self.increase_column_width(0, 16)
-                    item_pac = self.tabelademan.verticalHeaderItem(row)
-                    item_pac.setText(_translate('MainWindow', item.text()))
-        for row in range(self.tabelademan.rowCount()):
-            for colum in range(self.tabelademan.columnCount()):
-                if self.tabelademan.item(row, colum) == 'DATA E HORA DA RESERVA':
-                    break
-            data_reserva = self.tabelademan.item(row, colum).text()
-            current_datetime = QDateTime.currentDateTime()
-            formatted_date = current_datetime.toString('dd/MM/yyyy')
-            data_celula = ''
-            excel_blue = QtGui.QColor(255, 255, 255)
-            adjusted_color = excel_blue.lighter(100)
-            data_celula = ''
-            if data_reserva and ' ' in data_reserva:
-                data_celula = data_reserva.split()[0]
-            if data_reserva == '':
-                for column in range(self.tabelademan.columnCount()):
-                    item = self.tabelademan.item(row, column)
-                    if item is not None:
-                        new_item = QtWidgets.QTableWidgetItem(item.text())
-                        excel_blue = QtGui.QColor(255, 255, 255)
-                        new_item.setBackground(excel_blue)
-                        new_item.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-                        self.tabelademan.setItem(row, column, new_item)
-            else:
-                if formatted_date == data_celula:
-                    for column in range(self.tabelademan.columnCount()):
-                        item = self.tabelademan.item(row, column)
-                        if item is not None:
-                            new_item = QtWidgets.QTableWidgetItem(item.text())
-                            excel_blue = QtGui.QColor(31, 73, 125)
-                            adjusted_color = excel_blue.lighter(140)
-                            new_item.setBackground(adjusted_color)
-                            new_item.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-                            self.tabelademan.setItem(row, column, new_item)
-                if data_celula < formatted_date:
-                    for column in range(self.tabelademan.columnCount()):
-                        item = self.tabelademan.item(row, column)
-                        if item is not None:
-                            new_item = QtWidgets.QTableWidgetItem(item.text())
-                            excel_blue = QtGui.QColor(255, 148, 74)
-                            adjusted_color = excel_blue.lighter(140)
-                            new_item.setBackground(adjusted_color)
-                            new_item.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-                            self.tabelademan.setItem(row, column, new_item)
-            selecao = QtWidgets.QTableWidgetItem()
-            selecao.setFlags(QtCore.Qt.ItemFlag.ItemIsUserCheckable | QtCore.Qt.ItemFlag.ItemIsEnabled)
-            selecao.setCheckState(QtCore.Qt.CheckState.Unchecked)
-            selecao.setBackground(QtGui.QBrush(adjusted_color))
-            self.tabelademan.setItem(row, 0, selecao)
-        cursor.close()
-        conexao.close()
-
-    def atualiza_INTERNAÇÕES_E_TRANSF_EXTERNAS(self):
-        conexao = mysql.connector.connect(host='10.36.0.32', user='sglHC2024', password='S4g1L81', database='sgl')
-        cursor = conexao.cursor()
-        comando = 'SELECT * FROM tabela_internações_e_transf_externas'
-        cursor.execute(comando)
-        leitura = cursor.fetchall()
-        self.tabelademan.clearContents()
-        self.tabelademan.setRowCount(0)
-        for linha in leitura:
-            row = self.tabelademan.rowCount()
-            self.tabelademan.insertRow(row)
-            for column, valor in enumerate(linha):
-                item = QtWidgets.QTableWidgetItem(str(valor))
-                if column != 0:
-                    if item is None or item.text() == 'None':
-                        item = QtWidgets.QTableWidgetItem(str(''))
-                        item.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-                    self.tabelademan.setItem(row, column, item)
-                item.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-                if column == 0:
-                    self.tabelademan.setVerticalHeaderItem(row, item)
-                    _translate = QtCore.QCoreApplication.translate
-                    self.increase_column_width(0, row)
-                    item_pac = self.tabelademan.verticalHeaderItem(row)
-                    item_pac.setText(_translate('MainWindow', item.text()))
-        for row in range(self.tabelademan.rowCount()):
-            for colum in range(self.tabelademan.columnCount()):
-                if self.tabelademan.item(row, colum) == 'DATA E HORA DA RESERVA':
-                    break
-            data_reserva = self.tabelademan.item(row, colum).text()
-            current_datetime = QDateTime.currentDateTime()
-            formatted_date = current_datetime.toString('dd/MM/yyyy')
-            data_celula = ''
-            excel_blue = QtGui.QColor(255, 255, 255)
-            adjusted_color = excel_blue.lighter(100)
-            data_celula = ''
-            if data_reserva and ' ' in data_reserva:
-                data_celula = data_reserva.split()[0]
-            if data_reserva == '':
-                for column in range(self.tabelademan.columnCount()):
-                    item = self.tabelademan.item(row, column)
-                    if item is not None:
-                        new_item = QtWidgets.QTableWidgetItem(item.text())
-                        excel_blue = QtGui.QColor(255, 255, 255)
-                        new_item.setBackground(excel_blue)
-                        new_item.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-                        self.tabelademan.setItem(row, column, new_item)
-            else:
-                if formatted_date == data_celula:
-                    for column in range(self.tabelademan.columnCount()):
-                        item = self.tabelademan.item(row, column)
-                        if item is not None:
-                            new_item = QtWidgets.QTableWidgetItem(item.text())
-                            excel_blue = QtGui.QColor(31, 73, 125)
-                            adjusted_color = excel_blue.lighter(140)
-                            new_item.setBackground(adjusted_color)
-                            new_item.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-                            self.tabelademan.setItem(row, column, new_item)
-                if data_celula < formatted_date:
-                    for column in range(self.tabelademan.columnCount()):
-                        item = self.tabelademan.item(row, column)
-                        if item is not None:
-                            new_item = QtWidgets.QTableWidgetItem(item.text())
-                            excel_blue = QtGui.QColor(255, 148, 74)
-                            adjusted_color = excel_blue.lighter(140)
-                            new_item.setBackground(adjusted_color)
-                            new_item.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-                            self.tabelademan.setItem(row, column, new_item)
-            selecao = QtWidgets.QTableWidgetItem()
-            selecao.setFlags(QtCore.Qt.ItemFlag.ItemIsUserCheckable | QtCore.Qt.ItemFlag.ItemIsEnabled)
-            selecao.setCheckState(QtCore.Qt.CheckState.Unchecked)
-            selecao.setBackground(QtGui.QBrush(adjusted_color))
-            self.tabelademan.setItem(row, 0, selecao)
-        cursor.close()
-        conexao.close()
-
-    def atualiza_hemodinamica(self):
-        conexao = mysql.connector.connect(host='10.36.0.32', user='sglHC2024', password='S4g1L81', database='sgl')
-        cursor = conexao.cursor()
-        comando = 'SELECT * FROM tabela_hemodinamica'
-        cursor.execute(comando)
-        leitura = cursor.fetchall()
-        self.tabelademan.clearContents()
-        self.tabelademan.setRowCount(0)
-        for linha in leitura:
-            row = self.tabelademan.rowCount()
-            self.tabelademan.insertRow(row)
-            for column, valor in enumerate(linha):
-                item = QtWidgets.QTableWidgetItem(str(valor))
-                item.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-                if column != 0:
-                    if item is None or item.text() == 'None':
-                        item = QtWidgets.QTableWidgetItem(str(''))
-                        item.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-                    self.tabelademan.setItem(row, column, item)
-                if column == 0:
-                    self.tabelademan.setVerticalHeaderItem(row, item)
-                    _translate = QtCore.QCoreApplication.translate
-                    self.increase_column_width(0, 16)
-                    item_pac = self.tabelademan.verticalHeaderItem(row)
-                    item_pac.setText(_translate('MainWindow', item.text()))
-        for row in range(self.tabelademan.rowCount()):
-            for colum in range(self.tabelademan.columnCount()):
-                if self.tabelademan.item(row, colum) == 'DATA E HORA DA RESERVA':
-                    break
-            data_reserva = self.tabelademan.item(row, colum).text()
-            current_datetime = QDateTime.currentDateTime()
-            formatted_date = current_datetime.toString('dd/MM/yyyy')
-            data_celula = ''
-            excel_blue = QtGui.QColor(255, 255, 255)
-            adjusted_color = excel_blue.lighter(100)
-            data_celula = ''
-            if data_reserva and ' ' in data_reserva:
-                data_celula = data_reserva.split()[0]
-            if data_reserva == '':
-                for column in range(self.tabelademan.columnCount()):
-                    item = self.tabelademan.item(row, column)
-                    if item is not None:
-                        new_item = QtWidgets.QTableWidgetItem(item.text())
-                        excel_blue = QtGui.QColor(255, 255, 255)
-                        new_item.setBackground(adjusted_color)
-                        new_item.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-                        self.tabelademan.setItem(row, column, new_item)
-            else:
-                if formatted_date == data_celula:
-                    for column in range(self.tabelademan.columnCount()):
-                        item = self.tabelademan.item(row, column)
-                        if item is not None:
-                            new_item = QtWidgets.QTableWidgetItem(item.text())
-                            excel_blue = QtGui.QColor(31, 73, 125)
-                            adjusted_color = excel_blue.lighter(140)
-                            new_item.setBackground(adjusted_color)
-                            new_item.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-                            self.tabelademan.setItem(row, column, new_item)
-                if data_celula < formatted_date:
-                    for column in range(self.tabelademan.columnCount()):
-                        item = self.tabelademan.item(row, column)
-                        if item is not None:
-                            new_item = QtWidgets.QTableWidgetItem(item.text())
-                            excel_blue = QtGui.QColor(255, 148, 74)
-                            adjusted_color = excel_blue.lighter(140)
-                            new_item.setBackground(adjusted_color)
-                            new_item.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-                            self.tabelademan.setItem(row, column, new_item)
-            selecao = QtWidgets.QTableWidgetItem()
-            selecao.setFlags(QtCore.Qt.ItemFlag.ItemIsUserCheckable | QtCore.Qt.ItemFlag.ItemIsEnabled)
-            selecao.setCheckState(QtCore.Qt.CheckState.Unchecked)
-            selecao.setBackground(QtGui.QBrush(adjusted_color))
-            self.tabelademan.setItem(row, 0, selecao)
-        cursor.close()
-        conexao.close()
-
-    def atualiza_agenda_bloco(self):
-        conexao = mysql.connector.connect(host='10.36.0.32', user='sglHC2024', password='S4g1L81', database='sgl')
-        cursor = conexao.cursor()
-        comando = 'SELECT * FROM tabela_agenda_bloco_demanda'
-        cursor.execute(comando)
-        leitura = cursor.fetchall()
-        self.tabelademan.clearContents()
-        self.tabelademan.setRowCount(0)
-        for linha in leitura:
-            row = self.tabelademan.rowCount()
-            self.tabelademan.insertRow(row)
-            for column, valor in enumerate(linha):
-                item = QtWidgets.QTableWidgetItem(str(valor))
-                item.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-                if column != 0:
-                    if item is None or item.text() == 'None':
-                        item = QtWidgets.QTableWidgetItem(str(''))
-                        item.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-                    self.tabelademan.setItem(row, column, item)
-                if column == 0:
-                    self.tabelademan.setVerticalHeaderItem(row, item)
-                    _translate = QtCore.QCoreApplication.translate
-                    self.increase_column_width(0, 16)
-                    item_pac = self.tabelademan.verticalHeaderItem(row)
-                    item_pac.setText(_translate('MainWindow', item.text()))
-        for row in range(self.tabelademan.rowCount()):
-            for colum in range(self.tabelademan.columnCount()):
-                if self.tabelademan.item(row, colum) == 'DATA E HORA DA RESERVA':
-                    break
-            data_reserva = self.tabelademan.item(row, colum).text()
-            current_datetime = QDateTime.currentDateTime()
-            formatted_date = current_datetime.toString('dd/MM/yyyy')
-            data_celula = ''
-            if data_reserva and ' ' in data_reserva:
-                data_celula = data_reserva.split()[0]
-            if data_reserva == '':
-                for column in range(self.tabelademan.columnCount()):
-                    item = self.tabelademan.item(row, column)
-                    if item is not None:
-                        new_item = QtWidgets.QTableWidgetItem(item.text())
-                        excel_blue = QtGui.QColor(255, 255, 255)
-                        adjusted_color = excel_blue
-                        new_item.setBackground(excel_blue)
-                        new_item.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-                        self.tabelademan.setItem(row, column, new_item)
-            else:
-                if formatted_date == data_celula:
-                    for column in range(self.tabelademan.columnCount()):
-                        item = self.tabelademan.item(row, column)
-                        if item is not None:
-                            new_item = QtWidgets.QTableWidgetItem(item.text())
-                            excel_blue = QtGui.QColor(31, 73, 125)
-                            adjusted_color = excel_blue.lighter(140)
-                            new_item.setBackground(adjusted_color)
-                            new_item.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-                            self.tabelademan.setItem(row, column, new_item)
-                if data_celula < formatted_date:
-                    for column in range(self.tabelademan.columnCount()):
-                        item = self.tabelademan.item(row, column)
-                        if item is not None:
-                            new_item = QtWidgets.QTableWidgetItem(item.text())
-                            excel_blue = QtGui.QColor(255, 148, 74)
-                            adjusted_color = excel_blue.lighter(140)
-                            new_item.setBackground(adjusted_color)
-                            new_item.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-                            self.tabelademan.setItem(row, column, new_item)
-            selecao = QtWidgets.QTableWidgetItem()
-            selecao.setFlags(QtCore.Qt.ItemFlag.ItemIsUserCheckable | QtCore.Qt.ItemFlag.ItemIsEnabled)
-            selecao.setCheckState(QtCore.Qt.CheckState.Unchecked)
-            selecao.setBackground(QtGui.QBrush(adjusted_color))
-            self.tabelademan.setItem(row, 0, selecao)
-        cursor.close()
-        conexao.close()
-
-    def atualiza_alta_cti(self):
-        conexao = mysql.connector.connect(host='10.36.0.32', user='sglHC2024', password='S4g1L81', database='sgl')
-        cursor = conexao.cursor()
-        comando = 'SELECT * FROM alta_cti'
-        cursor.execute(comando)
-        leitura = cursor.fetchall()
-        self.tabelademan.clearContents()
-        self.tabelademan.setRowCount(0)
-        for linha in leitura:
-            row = self.tabelademan.rowCount()
-            self.tabelademan.insertRow(row)
-            for column, valor in enumerate(linha):
-                item = QtWidgets.QTableWidgetItem(str(valor))
-                item.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-                if column != 0:
-                    if item is None or item.text() == 'None':
-                        item = QtWidgets.QTableWidgetItem(str(''))
-                        item.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-                    self.tabelademan.setItem(row, column, item)
-                if column == 0:
-                    self.tabelademan.setVerticalHeaderItem(row, item)
-                    _translate = QtCore.QCoreApplication.translate
-                    self.increase_column_width(0, 16)
-                    item_pac = self.tabelademan.verticalHeaderItem(row)
-                    item_pac.setText(_translate('MainWindow', item.text()))
-        for row in range(self.tabelademan.rowCount()):
-            for colum in range(self.tabelademan.columnCount()):
-                if self.tabelademan.item(row, colum) == 'DATA E HORA DA RESERVA':
-                    break
-            data_reserva = self.tabelademan.item(row, colum).text()
-            current_datetime = QDateTime.currentDateTime()
-            formatted_date = current_datetime.toString('dd/MM/yyyy')
-            data_celula = ''
-            excel_blue = QtGui.QColor(255, 255, 255)
-            adjusted_color = excel_blue.lighter(100)
-            data_celula = ''
-            if data_reserva and ' ' in data_reserva:
-                data_celula = data_reserva.split()[0]
-            if data_reserva == '':
-                for column in range(self.tabelademan.columnCount()):
-                    item = self.tabelademan.item(row, column)
-                    if item is not None:
-                        new_item = QtWidgets.QTableWidgetItem(item.text())
-                        excel_blue = QtGui.QColor(255, 255, 255)
-                        new_item.setBackground(excel_blue)
-                        new_item.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-                        self.tabelademan.setItem(row, column, new_item)
-            else:
-                if formatted_date == data_celula:
-                    for column in range(self.tabelademan.columnCount()):
-                        item = self.tabelademan.item(row, column)
-                        if item is not None:
-                            new_item = QtWidgets.QTableWidgetItem(item.text())
-                            excel_blue = QtGui.QColor(31, 73, 125)
-                            adjusted_color = excel_blue.lighter(140)
-                            new_item.setBackground(adjusted_color)
-                            new_item.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-                            self.tabelademan.setItem(row, column, new_item)
-                if data_celula < formatted_date:
-                    for column in range(self.tabelademan.columnCount()):
-                        item = self.tabelademan.item(row, column)
-                        if item is not None:
-                            new_item = QtWidgets.QTableWidgetItem(item.text())
-                            excel_blue = QtGui.QColor(255, 148, 74)
-                            adjusted_color = excel_blue.lighter(140)
-                            new_item.setBackground(adjusted_color)
-                            new_item.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-                            self.tabelademan.setItem(row, column, new_item)
-            selecao = QtWidgets.QTableWidgetItem()
-            selecao.setFlags(QtCore.Qt.ItemFlag.ItemIsUserCheckable | QtCore.Qt.ItemFlag.ItemIsEnabled)
-            selecao.setCheckState(QtCore.Qt.CheckState.Unchecked)
-            selecao.setBackground(QtGui.QBrush(adjusted_color))
-            self.tabelademan.setItem(row, 0, selecao)
-        cursor.close()
-        conexao.close()
-
     def temporizador(self, MainWindow):
         self.timer_ps = QtCore.QTimer()
         self.timer_ps.setInterval(60000)
         self.tabelademan.cellChanged.connect(self.checkboxStateChanged)
         if self.variavel == 0:
-            self.timer_ps.timeout.connect(lambda: self.atualiza_ps('tabela_demanda_ps'))
+            self.timer_ps.timeout.connect(lambda: self.atualiza_tabela_demandas('tabela_demanda_ps'))
         if self.variavel == 1:
-            self.timer_ps.timeout.connect(lambda: self.atualiza_ps('alta_cti'))
+            self.timer_ps.timeout.connect(lambda: self.atualiza_tabela_demandas('alta_cti'))
         if self.variavel == 2:
-            self.timer_ps.timeout.connect(lambda: self.atualiza_ps('tabela_agenda_bloco_demanda'))
+            self.timer_ps.timeout.connect(lambda: self.atualiza_tabela_demandas('tabela_agenda_bloco_demanda'))
         if self.variavel == 3:
-            self.timer_ps.timeout.connect(lambda: self.atualiza_ps('tabela_hemodinamica'))
+            self.timer_ps.timeout.connect(lambda: self.atualiza_tabela_demandas('tabela_hemodinamica'))
         if self.variavel == 4:
-            self.timer_ps.timeout.connect(lambda: self.atualiza_ps('tabela_internações_e_transf_externas'))
+            self.timer_ps.timeout.connect(lambda: self.atualiza_tabela_demandas('tabela_internações_e_transf_externas'))
         if self.variavel == 5:
-            self.timer_ps.timeout.connect(lambda: self.atualiza_ps('tabela_transferencias_internas'))
+            self.timer_ps.timeout.connect(lambda: self.atualiza_tabela_demandas('tabela_transferencias_internas'))
         if self.variavel == 6:
-            self.timer_ps.timeout.connect(lambda: self.atualiza_ps('tabela_onco_hemato_ped'))
+            self.timer_ps.timeout.connect(lambda: self.atualiza_tabela_demandas('tabela_onco_hemato_ped'))
         self.timer_ps.start()
         self.increase_column_width(0, 16)
 
@@ -1922,7 +1615,7 @@ class Ui_Demanda(QtWidgets.QMainWindow):
             self.posicao_inicial_row = current_item.row()
             self.posicao_inicial_colum = current_item.column()
 
-    def atualiza_ps(self, tabela):
+    def atualiza_tabela_demandas(self, tabela):
 
         for colum in range(self.tabelademan.columnCount()):
             item_pac = self.tabelademan.horizontalHeaderItem(colum)
@@ -1966,8 +1659,8 @@ class Ui_Demanda(QtWidgets.QMainWindow):
             current_datetime = QDateTime.currentDateTime()
             formatted_date = current_datetime.toString('dd/MM/yyyy')
             self.increase_column_width(0, 16)
-            excel_blue = QtGui.QColor(255, 255, 255)
-            adjusted_color = excel_blue.lighter(100)
+            excel_color = QtGui.QColor(255, 255, 255)
+            adjusted_color = excel_color.lighter(100)
             data_celula = ''
             if data_reserva and ' ' in data_reserva:
                 data_celula = data_reserva.split()[0]
@@ -1977,8 +1670,8 @@ class Ui_Demanda(QtWidgets.QMainWindow):
                     if item is None:
                         continue
                     new_item = QtWidgets.QTableWidgetItem(item.text())
-                    excel_blue = QtGui.QColor(255, 255, 255)
-                    new_item.setBackground(excel_blue)
+                    excel_color = QtGui.QColor(255, 255, 255)
+                    new_item.setBackground(excel_color)
                     new_item.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
                     self.tabelademan.setItem(row, column, new_item)
             else:
@@ -1988,8 +1681,8 @@ class Ui_Demanda(QtWidgets.QMainWindow):
                         if item is None:
                             continue
                         new_item = QtWidgets.QTableWidgetItem(item.text())
-                        excel_blue = QtGui.QColor(31, 73, 125)
-                        adjusted_color = excel_blue.lighter(140)
+                        excel_color = QtGui.QColor(31, 73, 125)
+                        adjusted_color = excel_color.lighter(140)
                         new_item.setBackground(adjusted_color)
                         new_item.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
                         self.tabelademan.setItem(row, column, new_item)
@@ -1998,8 +1691,8 @@ class Ui_Demanda(QtWidgets.QMainWindow):
                         item = self.tabelademan.item(row, column)
                         if item is not None:
                             new_item = QtWidgets.QTableWidgetItem(item.text())
-                            excel_blue = QtGui.QColor(255, 148, 74)
-                            adjusted_color = excel_blue.lighter(140)
+                            excel_color = QtGui.QColor(255, 148, 74)
+                            adjusted_color = excel_color.lighter(140)
                             new_item.setBackground(adjusted_color)
                             new_item.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
                             self.tabelademan.setItem(row, column, new_item)
@@ -2008,6 +1701,25 @@ class Ui_Demanda(QtWidgets.QMainWindow):
             selecao.setCheckState(QtCore.Qt.CheckState.Unchecked)
             selecao.setBackground(QtGui.QBrush(adjusted_color))
             self.tabelademan.setItem(row, 0, selecao)
+
+            for colum in range(self.tabelademan.columnCount()):
+                dados = self.tabelademan.item(row, colum).text()
+                if dados == 'SIM':
+                    new_item = QtWidgets.QTableWidgetItem(dados)
+                    excel_color = QtGui.QColor(0,255,127)
+                    adjusted_color = excel_color.lighter(140)
+                    new_item.setBackground(adjusted_color)
+                    new_item.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+                    self.tabelademan.setItem(row, colum, new_item)
+                if dados == 'NÃO':
+                    new_item = QtWidgets.QTableWidgetItem(dados)
+                    excel_color = QtGui.QColor(250,128,114)
+                    adjusted_color = excel_color.lighter(140)
+                    new_item.setBackground(adjusted_color)
+                    new_item.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+                    self.tabelademan.setItem(row, colum, new_item)
+
+
         cursor.close()
         conexao.close()
         item = self.tabelademan.item(self.posicao_inicial_row, self.posicao_inicial_colum)
@@ -2178,7 +1890,7 @@ class Ui_Demanda(QtWidgets.QMainWindow):
         selecao.setCheckState(QtCore.Qt.CheckState.Unchecked)
         self.tabelademan.setItem(conta_linha, 0, selecao)
         self.copiadora()
-        self.atualiza_ps('tabela_onco_hemato_ped')
+        self.atualiza_tabela_demandas('tabela_onco_hemato_ped')
 
     def add_dados_transferencias_internas(self, formatted_date_time, name, data_nasc, leito_atual, motivo, tipo_leito):
         conta_linha = self.tabelademan.rowCount()
@@ -2194,7 +1906,7 @@ class Ui_Demanda(QtWidgets.QMainWindow):
         selecao.setCheckState(QtCore.Qt.CheckState.Unchecked)
         self.tabelademan.setItem(conta_linha, 0, selecao)
         self.copiadora()
-        self.atualiza_ps('tabela_transferencias_internas')
+        self.atualiza_tabela_demandas('tabela_transferencias_internas')
 
     def add_dados_internações_e_transf_externas(self, data_hora_inter_str, formatted_date_time, name, data_nasc, leito_atual, data_proced, clinica_pac, procedimento, tipo_leito, pos):
         conta_linha = self.tabelademan.rowCount()
@@ -2214,7 +1926,7 @@ class Ui_Demanda(QtWidgets.QMainWindow):
         selecao.setCheckState(QtCore.Qt.CheckState.Unchecked)
         self.tabelademan.setItem(conta_linha, 0, selecao)
         self.copiadora()
-        self.atualiza_ps('tabela_internações_e_transf_externas')
+        self.atualiza_tabela_demandas('tabela_internações_e_transf_externas')
 
     def add_dados_hemodinamica(self, data_hora_procd, name, data_nasc, data_int_str, formatted_date_time, leito_atual, clinica_pac, procedimento, prioridade, tipo_leito):
         conta_linha = self.tabelademan.rowCount()
@@ -2234,7 +1946,7 @@ class Ui_Demanda(QtWidgets.QMainWindow):
         selecao.setCheckState(QtCore.Qt.CheckState.Unchecked)
         self.tabelademan.setItem(conta_linha, 0, selecao)
         self.copiadora()
-        self.atualiza_ps('tabela_hemodinamica')
+        self.atualiza_tabela_demandas('tabela_hemodinamica')
 
     def add_dados_agenda(self, data_procd_str, name, data_nasc, leito_atual, clinica_pac, procedimento, medico, tipo_leito, enfermaria, prioridade):
         conta_linha = self.tabelademan.rowCount()
@@ -2253,7 +1965,7 @@ class Ui_Demanda(QtWidgets.QMainWindow):
         selecao.setFlags(QtCore.Qt.ItemFlag.ItemIsUserCheckable | QtCore.Qt.ItemFlag.ItemIsEnabled)
         selecao.setCheckState(QtCore.Qt.CheckState.Unchecked)
         self.tabelademan.setItem(conta_linha, 0, selecao)
-        self.atualiza_ps('tabela_agenda_bloco_demanda')
+        self.atualiza_tabela_demandas('tabela_agenda_bloco_demanda')
         self.copiadora()
 
     def add_dados(self, pronto, npf, name_ps, ponto_score_ps, data_nasc_ps, clinica_pac_ps, obs_ps, tipo_leito_ps, prioridade_solic_ps, nome_contato_sol):
@@ -2310,10 +2022,13 @@ class Ui_Demanda(QtWidgets.QMainWindow):
         colum_clinica = 0
         colum_data_de_confirmacao = 0
         colum_data_rese = 0
+        colum_pre_internacao_realizada = 0
         for colum in range(self.tabelademan.columnCount()):
             item_pac = self.tabelademan.horizontalHeaderItem(colum)
             if item_pac.text() == 'LEITO RESERVADO':
                 colum_leito_reservado = colum
+            if item_pac.text() == 'PRÉ INTERNAÇÃO REALIZADA?':
+                colum_pre_internacao_realizada = colum
             if item_pac.text() == 'CLÍNICA':
                 colum_clinica = colum
             if item_pac.text() == 'DATA DE CONFIRMAÇÃO DA ALTA':
@@ -2386,6 +2101,17 @@ class Ui_Demanda(QtWidgets.QMainWindow):
                             self.combo_box.addItem('CTI COVID')
                             self.combo_box.addItem('INTERNAÇÃO VIRTUAL')
                         self.tabelademan.setCellWidget(row, colum_tipo_de_leito, self.combo_box)
+                if colum_pre_internacao_realizada != 0:
+                    for row in range(self.tabelademan.rowCount()):
+                        self.combo_box_pre_internacao_realizada = QComboBox()
+                        item = self.tabelademan.item(row, colum_tipo_de_leito)
+                        if item is not None:
+                            self.combo_box_pre_internacao_realizada.addItem(item.text())
+                            self.combo_box_pre_internacao_realizada.setItemText(0, item.text())
+                            self.combo_box_pre_internacao_realizada.addItem('SIM')
+                            self.combo_box_pre_internacao_realizada.addItem('NÃO')
+                            self.combo_box_pre_internacao_realizada.addItem('NÃO SE APLICA')
+                        self.tabelademan.setCellWidget(row, colum_pre_internacao_realizada, self.combo_box_pre_internacao_realizada)
                 if colum_clinica != 0 and self.dept == 'PS':
                     for row in range(self.tabelademan.rowCount()):
                         self.combo_box = QComboBox()
@@ -2572,6 +2298,10 @@ class Ui_Demanda(QtWidgets.QMainWindow):
                     msg_box.setWindowIcon(icon)
                     msg_box.setStandardButtons(QMessageBox.StandardButton.Ok)
                     reply = msg_box.exec()
+                if colum_pre_internacao_realizada != 0:
+                    for row in range(self.tabelademan.rowCount()):
+                        self.combo_box_pre_internacao_realizada = self.tabelademan.cellWidget(row, colum_pre_internacao_realizada)
+                        self.combo_box_pre_internacao_realizada.close()
                 if colum_tipo_de_leito != 0:
                     for row in range(self.tabelademan.rowCount()):
                         self.combo_box = self.tabelademan.cellWidget(row, colum_tipo_de_leito)
@@ -2871,6 +2601,9 @@ class Ui_Demanda(QtWidgets.QMainWindow):
         item.setText(_translate('MainWindow', 'LEITO RESERVADO'))
         item = self.tabelademan.horizontalHeaderItem(17)
         item.setText(_translate('MainWindow', 'DATA E HORA DA RESERVA'))
+        item = self.tabelademan.horizontalHeaderItem(18)
+        item.setText(_translate('MainWindow', 'PRÉ INTERNAÇÃO REALIZADA?'))
+
         self.labeltitulo.setText(_translate('MainWindow', "SOLICITAÇÃO DE LEITOS ALTA CTI'S"))
         for colum in range(1, self.tabelademan.columnCount()):
             item_pac = self.tabelademan.horizontalHeaderItem(colum).text()
@@ -3164,7 +2897,6 @@ class Ui_Demanda(QtWidgets.QMainWindow):
         return self.mainwindow
 
     def toggle_frame_visibility(self, sidebar):
-        print(self.cadastro_Aberta)
         if not sidebar.isHidden():
             sidebar.hide()
             self.label_icone.setStyleSheet('border-radius: 10px;')
@@ -3173,7 +2905,6 @@ class Ui_Demanda(QtWidgets.QMainWindow):
             self.config_Aberta = False
             self.timer_ps.start()
         if self.cadastro_Aberta == True:
-            print('leiaoearaa')
             self.janela_cadastro.close()
             self.cadastro_Aberta = False
             self.timer_ps.start()
@@ -3193,7 +2924,6 @@ class Ui_Demanda(QtWidgets.QMainWindow):
             btn.setEnabled(True)
 
     def close_frame(self, row, col):
-        print('leiaoearaa')
         if not self.sidebar.isHidden():
             self.sidebar.hide()
             self.label_icone.setStyleSheet('border-radius: 10px;')
@@ -3202,7 +2932,6 @@ class Ui_Demanda(QtWidgets.QMainWindow):
             self.timer_ps.start()
             self.config_Aberta = False
         if self.cadastro_Aberta == True:
-            print('leiaoearaa')
             self.janela_cadastro.close()
             self.cadastro_Aberta = False
             self.timer_ps.start()
@@ -3222,7 +2951,6 @@ class Ui_Demanda(QtWidgets.QMainWindow):
             btn.setEnabled(True)
 
     def check_scrollbar_value(self):
-        print('leiaoearaa')
         if self.tabelademan.horizontalScrollBar().value() != self.barra:
             if not self.sidebar.isHidden():
                 self.sidebar.hide()

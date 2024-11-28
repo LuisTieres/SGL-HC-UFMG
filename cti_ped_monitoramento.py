@@ -347,16 +347,15 @@ class Ui_Form(object):
 
                     label.setAlignment(Qt.AlignmentFlag.AlignCenter)
                     label.setCursor(Qt.CursorShape.OpenHandCursor)
-                    label.mousePressEvent = lambda event, label=label: self.mousePressEvent(event, label)
-                    label.mouseReleaseEvent = lambda event, label=label: self.mouseReleaseEvent(event, label)
-                    label.mouseMoveEvent = lambda event, label=label: self.mouseMoveEvent(event, label)
+                    label.mousePressEvent = lambda event, label_aux=label: self.mousePressEvent(event, label_aux)
+                    label.mouseReleaseEvent = lambda event, label_aux=label: self.mouseReleaseEvent(event, label_aux)
+                    label.mouseMoveEvent = lambda event, label_aux=label: self.mouseMoveEvent(event, label_aux)
                     label.setStyleSheet('background-color: rgb(170, 255, 255);')
                     self.lisa.append(label)
 
             except FileNotFoundError:
                 print(1)
 
-        else:
             self.atualizar_monitoramento(Form)
             self.conf_layout()
 

@@ -83,7 +83,6 @@ class Ui_CTI_PED(QtWidgets.QMainWindow):
         width = size.width() - 10
         height = size.height() - 35
 
-
         #Frame do relátorio
         self.frame_relatorio = QtWidgets.QFrame(parent=self.frame)
         self.frame_relatorio.setStyleSheet('background-color: #5DADE2;')
@@ -1476,6 +1475,11 @@ class Ui_CTI_PED(QtWidgets.QMainWindow):
 
     # funcao atualiza_cti atualiza as tabelas
     def atualiza_cti(self):
+        for colum in range(self.tabela_grade.columnCount()):
+            item_pac = self.tabela_grade.horizontalHeaderItem(colum)
+            if item_pac.text() == 'NPF':
+                self.tabela_grade.hideColumn(colum)
+
         lista_leitos = []
         connection = psycopg2.connect(user='ugen_integra', password='aghuintegracao', host='10.36.2.35', port='6544', database='dbaghu')
         cursor = connection.cursor()
@@ -1486,7 +1490,6 @@ class Ui_CTI_PED(QtWidgets.QMainWindow):
             semzero = row[1].lstrip('0')
             dados = f'{sem_hifen}_{semzero}'
             lista_leitos.append(dados)
-            print(dados)
             dados = dados + '_aguardando'
             lista_leitos.append(dados)
         if self.tabela_grade.currentItem():
@@ -1621,6 +1624,24 @@ class Ui_CTI_PED(QtWidgets.QMainWindow):
                 selecao.setCheckState(QtCore.Qt.CheckState.Unchecked)
                 selecao.setBackground(QtGui.QBrush(adjusted_color))
                 self.tabela_grade.setItem(row, 0, selecao)
+
+            # Atualiza cor da celula para verde claro se Sim e vermelho claro se Não
+            for colum in range(self.tabela_grade.columnCount()):
+                dados = self.tabela_grade.item(row, colum).text()
+                if dados == 'SIM':
+                    new_item = QtWidgets.QTableWidgetItem(dados)
+                    excel_color = QtGui.QColor(0, 255, 127)
+                    adjusted_color = excel_color.lighter(140)
+                    new_item.setBackground(adjusted_color)
+                    new_item.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+                    self.tabela_grade.setItem(row, colum, new_item)
+                if dados == 'NÃO':
+                    new_item = QtWidgets.QTableWidgetItem(dados)
+                    excel_color = QtGui.QColor(250, 128, 114)
+                    adjusted_color = excel_color.lighter(140)
+                    new_item.setBackground(adjusted_color)
+                    new_item.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+                    self.tabela_grade.setItem(row, colum, new_item)
         cursor.close()
         conexao.close()
         for colum in range(1, self.tabela_grade.columnCount()):
@@ -1839,10 +1860,10 @@ class Ui_CTI_PED(QtWidgets.QMainWindow):
                             item_pac = self.tabela_grade.horizontalHeaderItem(colum)
                             if item_pac.text() == 'STATUS DO LEITO':
                                 item_text = 'VAGO'
-                            else:  # inserted
+                            else:
                                 if item_pac.text() == 'SEXO DA ENFERMARIA':
                                     item_text = self.tabela_grade.item(row, colum).text()
-                                else:  # inserted
+                                else:
                                     item_text = ''
                             item_copy = QtWidgets.QTableWidgetItem(item_text)
                             self.tabela_grade.setItem(row, colum, item_copy)
@@ -2233,7 +2254,7 @@ class Ui_CTI_PED(QtWidgets.QMainWindow):
                             self.tabela_grade.setCellWidget(row, colum, line_edit)
                     for l in list_colum:
                         print(l)
-            else:  # inserted
+            else:
                 msg_box = QMessageBox()
                 msg_box.setIcon(QMessageBox.Icon.Information)
                 msg_box.setWindowTitle('AVISO')
@@ -2526,7 +2547,7 @@ class Ui_CTI_PED(QtWidgets.QMainWindow):
 
         try:
             with open(filename, mode='r') as file:
-                pass  # Placeholder for code to read an existing file
+                pass
 
         except FileNotFoundError:
             with open(filename, mode='w') as file:

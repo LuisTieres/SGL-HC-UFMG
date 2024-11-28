@@ -427,7 +427,7 @@ class Ui_Form(object):
 
         for row in range(self.tela.conta_linha()):
             leito = self.tela.leito(row)
-            if self.tela.help_sccrol_painel == True:
+            if self.tela.help_sccrol_painel:
                 label = QLabel(leito.text(), self.frame_tela)
             else:
                 label = QLabel(leito.text(), self.tela.frame_do_monitoramento)
@@ -435,7 +435,7 @@ class Ui_Form(object):
             label.setGeometry(0, 0, 60, 25)
             filename = 'monitora_decimo_norte.csv'
 
-            if self.tela.help_sccrol_painel == True:
+            if self.tela.help_sccrol_painel:
                 filename = 'monitora_decimo_nortepainel.csv'
 
             try:
@@ -448,10 +448,11 @@ class Ui_Form(object):
                             y = int(data[row][2])
                             label.setGeometry(x, y, 60, 40)
                             break
+
                     label.setAlignment(Qt.AlignmentFlag.AlignCenter)
                     label.setCursor(Qt.CursorShape.OpenHandCursor)
-                    label.mousePressEvent = lambda event, label=label: self.mousePressEvent(event, label)
-                    label.mouseMoveEvent = lambda event, label=label: self.mouseMoveEvent(event, label)
+                    label.mousePressEvent = lambda event, label_aux=label: self.mousePressEvent(event, label_aux)
+                    label.mouseMoveEvent = lambda event, label_aux=label: self.mouseMoveEvent(event, label_aux)
                     label.setStyleSheet('background-color: rgb(170, 255, 255);')
                     label.setWordWrap(True)
                     self.lisa.append(label)
@@ -460,9 +461,8 @@ class Ui_Form(object):
             except FileNotFoundError:
                 print(1)
 
-        else:
             self.conf_layout()
-            if self.tela.help_sccrol_painel == True:
+            if self.tela.help_sccrol_painel:
                 self.frame.move(150, 242)
                 self.frame_3.move(500, 42)
                 self.frame_2.move(150, 202)

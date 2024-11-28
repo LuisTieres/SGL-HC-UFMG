@@ -359,18 +359,17 @@ class Ui_Form(object):
             self.tela.abri_cti(Form, 'UNIDADE DE INTERNAÇÃO - 07N')
         for row in range(self.tela.conta_linha()):
             leito = self.tela.leito(row)
-            if self.tela.help_sccrol_painel == True:
+            if self.tela.help_sccrol_painel:
                 label = QLabel(leito.text(), self.frame_tela)
             else:
                 label = QLabel(leito.text(), self.tela.frame_do_monitoramento)
 
-            icon = QtGui.QIcon(
-                'C:\\Users\\luist\\OneDrive\\Área de Trabalho\\Ti\\Nova pasta\\HC-UFMG\\SGL\\emergencia.ico')
+            icon = QtGui.QIcon('emergencia.ico')
             pixmap = icon.pixmap(40, 40)
             label.setGeometry(0, 0, 60, 30)
 
             filename = 'monitora_setimo_norte.csv'
-            if self.tela.help_sccrol_painel == True:
+            if self.tela.help_sccrol_painel:
                 filename = 'monitora_setimo_nortepainel.csv'
 
             try:
@@ -385,8 +384,8 @@ class Ui_Form(object):
                             break
                     label.setAlignment(Qt.AlignmentFlag.AlignCenter)
                     label.setCursor(Qt.CursorShape.OpenHandCursor)
-                    label.mousePressEvent = lambda event, label=label: self.mousePressEvent(event, label)
-                    label.mouseMoveEvent = lambda event, label=label: self.mouseMoveEvent(event, label)
+                    label.mousePressEvent = lambda event, label_aux=label: self.mousePressEvent(event, label_aux)
+                    label.mouseMoveEvent = lambda event, label_aux=label: self.mouseMoveEvent(event, label_aux)
                     label.setWordWrap(True)
 
                     fonte = QFont()
@@ -396,11 +395,11 @@ class Ui_Form(object):
                     self.lisa.append(label)
             except FileNotFoundError:
                 print("File not found")
-        else:
+
             self.atualizar_monitoramento(Form)
             self.conf_layout()
 
-            if self.tela.help_sccrol_painel == True:
+            if self.tela.help_sccrol_painel:
                 self.frame.move(120, 153)
                 self.frame_13.move(690, 28)
                 self.frame_2.move(120, 103)

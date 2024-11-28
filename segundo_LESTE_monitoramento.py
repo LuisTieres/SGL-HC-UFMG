@@ -532,38 +532,47 @@ class Ui_Form(object):
             self.tela.abri_cti(Form, 'UNIDADE DE INTERNAÇÃO - 02L')
         for row in range(self.tela.conta_linha()):
             leito = self.tela.leito(row)
-            if self.tela.help_sccrol_painel == True:
+
+            if self.tela.help_sccrol_painel:
                 label = QLabel(leito.text(), self.frame_tela)
-            else:  # inserted
+            else:
                 label = QLabel(leito.text(), self.tela.frame_do_monitoramento)
+
             label.setGeometry(0, 0, 60, 25)
+
+            # Definir o nome do arquivo dependendo da condição
             filename = 'monitora_segundo_leste.csv'
-            if self.tela.help_sccrol_painel == True:
+            if self.tela.help_sccrol_painel:
                 filename = 'monitora_segundo_lestepainel.csv'
+
             try:
                 with open(filename, mode='r') as file:
-                    pass  # postinserted
-            except FileNotFoundError:
-                print(1)
                     reader = csv.reader(file)
                     data = list(reader)
-                    for row in range(len(data)):
-                        if data[row][0] == leito.text():
-                            x = int(data[row][1])
-                            y = int(data[row][2])
+
+                    # Processar os dados do arquivo
+                    for data_row in data:
+                        if data_row[0] == leito.text():
+                            x = int(data_row[1])
+                            y = int(data_row[2])
                             label.setGeometry(x, y, 60, 30)
                             break
-                        label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-                        label.setCursor(Qt.CursorShape.OpenHandCursor)
-                        label.mousePressEvent = lambda event, label=label: self.mousePressEvent(event, label)
-                        label.mouseMoveEvent = lambda event, label=label: self.mouseMoveEvent(event, label)
-                        label.setStyleSheet('background-color: rgb(170, 255, 255);')
-                        label.setWordWrap(True)
-                        self.lisa.append(label)
-                        self.atualizar_monitoramento(Form)
-        else:  # inserted
+
+                    # Configurações adicionais para o label
+                    label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+                    label.setCursor(Qt.CursorShape.OpenHandCursor)
+                    label.mousePressEvent = lambda event, label_aux=label: self.mousePressEvent(event, label_aux)
+                    label.mouseMoveEvent = lambda event, label_aux=label: self.mouseMoveEvent(event, label_aux)
+                    label.setStyleSheet('background-color: rgb(170, 255, 255);')
+                    label.setWordWrap(True)
+                    self.lisa.append(label)
+                    self.atualizar_monitoramento(Form)
+
+            except FileNotFoundError:
+                print(f"Arquivo {filename} não encontrado.")
+
             self.conf_layout()
-            if self.tela.help_sccrol_painel == True:
+            if self.tela.help_sccrol_painel:
                 self.frame.move(0, 178)
                 self.frame_13.move(200, 28)
                 self.frame_2.move(0, 138)

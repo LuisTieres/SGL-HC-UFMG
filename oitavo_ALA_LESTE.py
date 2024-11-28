@@ -798,8 +798,8 @@ class Ui_Form(object):
 
             label.setAlignment(Qt.AlignmentFlag.AlignCenter)
             label.setCursor(Qt.CursorShape.OpenHandCursor)
-            label.mousePressEvent = lambda event, label=label: self.mousePressEvent(event, label)
-            label.mouseMoveEvent = lambda event, label=label: self.mouseMoveEvent(event, label)
+            label.mousePressEvent = lambda event, label_aux=label: self.mousePressEvent(event, label_aux)
+            label.mouseMoveEvent = lambda event, label_aux=label: self.mouseMoveEvent(event, label_aux)
             label.setWordWrap(True)
             fonte = QFont()
             fonte.setPointSize(10)
@@ -808,7 +808,6 @@ class Ui_Form(object):
             self.labels.append(label)
             self.atualizar_monitoramento(Form)
 
-        else:
             self.conf_layout()
             if self.tela.help_sccrol_painel:
                 self.tela.total_bloq += self.bloqueado

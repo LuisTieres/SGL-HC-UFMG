@@ -228,18 +228,17 @@ class Ui_Form(object):
 
         for row in range(self.tela.conta_linha()):
             leito = self.tela.leito(row)
-            icon = QtGui.QIcon(
-                'C:\\Users\\luist\\OneDrive\\Área de Trabalho\\Ti\\Nova pasta\\HC-UFMG\\SGL\\emergencia.ico')
+            icon = QtGui.QIcon('emergencia.ico')
             pixmap = icon.pixmap(40, 40)
 
-            if self.tela.scroll_painel.isVisible() or self.tela.help_sccrol_painel == True:
+            if self.tela.scroll_painel.isVisible() or self.tela.help_sccrol_painel:
                 label = QLabel(leito.text(), self.frame)
             else:
                 label = QLabel(leito.text(), self.tela.frame_do_monitoramento)
 
             label.setGeometry(0, 0, 60, 30)
             filename = 'monitora_cti_ps.csv'
-            if self.tela.scroll_painel.isVisible() or self.tela.help_sccrol_painel == True:
+            if self.tela.scroll_painel.isVisible() or self.tela.help_sccrol_painel:
                 filename = 'monitora_cti_pspainel.csv'
 
             try:
@@ -254,18 +253,17 @@ class Ui_Form(object):
                             break
                     label.setAlignment(Qt.AlignmentFlag.AlignCenter)
                     label.setCursor(Qt.CursorShape.OpenHandCursor)
-                    label.mousePressEvent = lambda event, label=label: self.mousePressEvent(event, label)
-                    label.mouseMoveEvent = lambda event, label=label: self.mouseMoveEvent(event, label)
+                    label.mousePressEvent = lambda event, label_aux=label: self.mousePressEvent(event, label_aux)
+                    label.mouseMoveEvent = lambda event, label_aux=label: self.mouseMoveEvent(event, label_aux)
                     label.setStyleSheet('background-color: rgb(170, 255, 255);')
                     self.labels.append(label)
 
             except FileNotFoundError:
                 print("Arquivo não encontrado")
 
-        else:
             self.atualizar_monitoramento(Form)
             self.conf_layout()
-            if self.tela.scroll_painel.isVisible() or self.tela.help_sccrol_painel == True:
+            if self.tela.scroll_painel.isVisible() or self.tela.help_sccrol_painel:
                 self.frame_3.move(300, 200)
                 self.corredor1.move(800, 322)
                 self.corredor2.move(746, 322)

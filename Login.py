@@ -8,12 +8,18 @@ class ClickableLabel(QtWidgets.QLabel):
 
     def mousePressEvent(self, event):
         self.clicked.emit()
+
+
 class Ui_Form(object):
+
     def setupUi(self, Form):
-        # Dados Bancos Mysql:
-        self.host_mysql = 'localhost'
-        self.user_mysql = 'root',
-        self.password_mysql = 'camileejose'
+        # Configuração do Form para ficar sem bordas e com fundo translúcido
+        Form.setWindowFlags(QtCore.Qt.WindowType.FramelessWindowHint)
+        Form.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
+
+        # Definindo o ícone da janela
+        icon = QIcon('icone_p_eUO_icon.ico')
+        Form.setWindowIcon(icon)
 
         Form.setObjectName("Form")
         Form.setFixedSize(612, 567)
@@ -21,7 +27,17 @@ class Ui_Form(object):
         icon = QIcon('icone_p_eUO_icon.ico')
         Form.setWindowIcon(icon)
         Form.setStyleSheet("background-color: rgb(0, 74, 112);")
-        self.frame = QtWidgets.QFrame(parent=Form)
+
+        self.frame_Form = QtWidgets.QFrame(parent=Form)
+        self.frame_Form.setGeometry(QtCore.QRect(0, 0, 612, 567))
+        self.frame_Form.setStyleSheet("background-color: rgb(0, 74, 112);\n"
+                                 "border: 2px solid while;\n"
+                                 "border-radius: 10px;")
+        self.frame_Form.setFrameShape(QtWidgets.QFrame.Shape.StyledPanel)
+        self.frame_Form.setFrameShadow(QtWidgets.QFrame.Shadow.Raised)
+        self.frame_Form.setObjectName("frame")
+
+        self.frame = QtWidgets.QFrame(parent=self.frame_Form)
         self.frame.setGeometry(QtCore.QRect(80, 190, 461, 341))
         self.frame.setStyleSheet("background-color: rgba(0, 0, 0,0.2);\n"
 "border: 2px solid while;\n"
@@ -99,8 +115,34 @@ class Ui_Form(object):
 "\n"
 "}")
         self.login_2.setObjectName("login_2")
-        self.login_2.clicked.connect(lambda :self.criar_conta(Form))
-        self.login.clicked.connect(lambda :self.logar(Form))
+        self.login_2.clicked.connect(lambda :self.criar_conta(self.frame_Form))
+        self.login.clicked.connect(lambda :self.logar(self.frame_Form))
+
+        self.bnt_sair = QtWidgets.QPushButton('X',parent=self.frame_Form)
+        self.bnt_sair.setGeometry(QtCore.QRect(580, 5, 25, 25))
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.bnt_sair.setFont(font)
+        self.bnt_sair.setCursor(QtGui.QCursor(QtCore.Qt.CursorShape.PointingHandCursor))
+        self.bnt_sair.setStyleSheet("""
+            QPushButton {
+                background-color: transparent;
+                color: rgb(0, 0, 0);
+                border-radius: 10px;
+                border: transparent;
+                font-weight: bold; /* Deixa o texto mais grosso */
+            }
+            QPushButton:hover {
+                background-color: rgba(255, 255, 255, 0.2);
+                color: rgb(0, 0, 0);
+                border: transparent;
+                border-radius: 10px;
+                font-weight: bold; /* Deixa o texto mais grosso ao passar o mouse */
+            }
+        """)
+
+        self.bnt_sair.setObjectName("bnt_sair")
+        self.bnt_sair.clicked.connect(Form.close)
 
         self.label_2 = QtWidgets.QLabel(parent=self.frame)
         self.label_2.setGeometry(QtCore.QRect(50, 160, 41, 31))
@@ -116,7 +158,7 @@ class Ui_Form(object):
         self.label_3.setPixmap(QtGui.QPixmap("sombra-de-usuario-masculino.png"))
         self.label_3.setScaledContents(True)
         self.label_3.setObjectName("label_3")
-        self.label = QtWidgets.QLabel(parent=Form)
+        self.label = QtWidgets.QLabel(parent=self.frame_Form)
         self.label.setGeometry(QtCore.QRect(190, 40, 221, 171))
         self.label.setText("")
         self.label.setPixmap(QtGui.QPixmap("icon_title.png"))
@@ -142,7 +184,7 @@ class Ui_Form(object):
         self.password.textChanged.connect(self.ocultar_user_label)
 
         self.retranslateUi(Form)
-        QtCore.QMetaObject.connectSlotsByName(Form)
+        QtCore.QMetaObject.connectSlotsByName(self.frame_Form)
         Form.setTabOrder(self.user, self.password)
         Form.setTabOrder(self.password, self.login)
         Form.setTabOrder(self.login, self.login_2)
