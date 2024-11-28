@@ -4,7 +4,6 @@ from GRADE import Ui_CTI_PED
 from PyQt6.QtCore import QDateTime, QSettings, QStandardPaths, QFile, Qt
 from PyQt6.QtGui import QIcon, QPixmap, QGuiApplication
 import datetime
-import sys
 import matplotlib.pyplot as plt
 from PyQt6.QtWidgets import QVBoxLayout
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
@@ -649,6 +648,7 @@ class Ui_Demanda(QtWidgets.QMainWindow):
             self.btnexclu.setObjectName('btnexclu')
             self.btnexclu.clicked.connect(self.excluir_demanda)
             self.btnexclu.setStyleSheet('\n                                    QPushButton {\n                                        border: 2px solid #2E3D48;\n                                        border-radius: 10px;\n                                        background-color: #FFFFFF;\n                                        color: #2E3D48;\n                                    }\n                                    QPushButton:pressed {\n                                        background-color: #2E3D48;\n                                        color: #FFFFFF;\n                                    }\n                                ')
+
         if self.dept == 'Terapía Intensiva':
             self.btn_confirm_alta = QtWidgets.QPushButton(parent=self.frame)
             self.btn_confirm_alta.setObjectName('btn_confirm_alta')

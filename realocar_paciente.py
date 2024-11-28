@@ -12,16 +12,19 @@ class Ui_Form(object):
         self.password_mysql = 'camileejose'
         self.alta = alta
         self.grade = grade
+
         self.settings = QSettings('HC', 'SGL')
         script_directory = QStandardPaths.writableLocation(QStandardPaths.StandardLocation.AppDataLocation)
         config_file_path = f'{script_directory}/config.ini'
         self.settings = QSettings(config_file_path, QSettings.Format.IniFormat)
+
         self.frame = QtWidgets.QFrame(parent=Form)
         self.frame.setFrameShape(QtWidgets.QFrame.Shape.StyledPanel)
         self.frame.setGeometry(QtCore.QRect(270, 50, 790, 538))
         self.frame.setFrameShadow(QtWidgets.QFrame.Shadow.Raised)
         self.frame.setObjectName('frame')
         self.grade.janela_realocar = self.frame
+
         self.tabela_demanda = QtWidgets.QTableWidget(parent=self.frame)
         self.tabela_demanda.setGeometry(QtCore.QRect(10, 110, 751, 251))
         self.tabela_demanda.setStyleSheet('background-color: rgb(255, 255, 255);border: none;gridline-color: black;')
@@ -29,6 +32,7 @@ class Ui_Form(object):
         self.tabela_demanda.setColumnCount(11)
         self.tabela_demanda.setRowCount(0)
         item = QtWidgets.QTableWidgetItem()
+
         font = QtGui.QFont('Arial', 15, weight=QtGui.QFont.Weight.Bold)
         font.setPointSize(8)
         font.setBold(True)
@@ -105,56 +109,68 @@ class Ui_Form(object):
         font.setWeight(75)
         item.setFont(font)
         self.tabela_demanda.setHorizontalHeaderItem(10, item)
+
         colo = '\n            QPushButton {\n                border: 2px solid #2E3D48;\n                border-radius: 10px;\n                background-color: #FFFFFF;\n                color: #2E3D48;\n            }\n            QPushButton:pressed {\n                background-color: #2E3D48;\n                color: #FFFFFF;\n            }\n        '
+
         self.BARRADEPESQUISA = QtWidgets.QLineEdit(parent=self.frame)
         self.BARRADEPESQUISA.setGeometry(QtCore.QRect(130, 80, 301, 21))
         self.BARRADEPESQUISA.setObjectName('BARRADEPESQUISA')
         self.BARRADEPESQUISA.setStyleSheet('border: 2px solid white; border-radius: 10px; background-color: white;')
         self.BARRADEPESQUISA.textChanged.connect(self.pesquisar)
+
         self.procurar = QtWidgets.QLabel(parent=self.frame)
         self.procurar.setGeometry(QtCore.QRect(10, 83, 115, 16))
         font = QtGui.QFont()
         font.setPointSize(8)
         self.procurar.setFont(font)
         self.procurar.setObjectName('label')
+
         self.tabela_demanda.setHorizontalHeaderItem(8, item)
         self.tabela_demanda.horizontalHeader().setDefaultSectionSize(140)
         self.tabela_demanda.setEditTriggers(QtWidgets.QTableWidget.EditTrigger.NoEditTriggers)
+
         self.ps = QtWidgets.QPushButton(parent=self.frame)
         self.ps.setGeometry(QtCore.QRect(10, 55, 111, 21))
         self.ps.setObjectName('ps')
         self.ps.setStyleSheet(colo)
         self.ps.clicked.connect(lambda: self.atualiza_tela('PS', Form))
+
         self.onco_hemato_ped = QtWidgets.QPushButton(parent=self.frame)
         self.onco_hemato_ped.setGeometry(QtCore.QRect(673, 55, 116, 21))
         self.onco_hemato_ped.setObjectName('onco_hemato_ped')
         self.onco_hemato_ped.clicked.connect(lambda: self.atualiza_tela('ONCO_HEMATO_PED', Form))
         self.onco_hemato_ped.setStyleSheet(colo)
+
         self.tran_inte = QtWidgets.QPushButton(parent=self.frame)
         self.tran_inte.setGeometry(QtCore.QRect(563, 55, 101, 21))
         self.tran_inte.setObjectName('tran_inte')
         self.tran_inte.clicked.connect(lambda: self.atualiza_tela('TRA_INTER', Form))
         self.tran_inte.setStyleSheet(colo)
+
         self.agenda_bloco = QtWidgets.QPushButton(parent=self.frame)
         self.agenda_bloco.setGeometry(QtCore.QRect(200, 55, 98, 21))
         self.agenda_bloco.setObjectName('agenda_bloco')
         self.agenda_bloco.clicked.connect(lambda: self.atualiza_tela('AGENDA_BLOCO', Form))
         self.agenda_bloco.setStyleSheet(colo)
+
         self.inter_tran_exte = QtWidgets.QPushButton(parent=self.frame)
         self.inter_tran_exte.setGeometry(QtCore.QRect(416, 55, 137, 21))
         self.inter_tran_exte.setObjectName('inter_tran_exte')
         self.inter_tran_exte.clicked.connect(lambda: self.atualiza_tela('INTER_TRAN_EXTER', Form))
         self.inter_tran_exte.setStyleSheet(colo)
+
         self.hemodinamica = QtWidgets.QPushButton(parent=self.frame)
         self.hemodinamica.setGeometry(QtCore.QRect(307, 55, 100, 21))
         self.hemodinamica.setObjectName('hemodinamica')
         self.hemodinamica.clicked.connect(lambda: self.atualiza_tela('HEMODINAMICA', Form))
         self.hemodinamica.setStyleSheet(colo)
+
         self.alta_cti = QtWidgets.QPushButton(parent=self.frame)
         self.alta_cti.setGeometry(QtCore.QRect(130, 55, 61, 21))
         self.alta_cti.setObjectName('alta_cti')
         self.alta_cti.clicked.connect(lambda: self.atualiza_tela('ALTA_CTI', Form))
         self.alta_cti.setStyleSheet(colo)
+
         self.titulo = QtWidgets.QLabel(parent=self.frame)
         self.titulo.setGeometry(QtCore.QRect(170, 23, 398, 31))
         font = QtGui.QFont()
@@ -162,11 +178,13 @@ class Ui_Form(object):
         self.titulo.setFont(font)
         self.titulo.setStyleSheet('alternate-background-color: rgb(255, 255, 255);')
         self.titulo.setObjectName('titulo')
+
         self.confirmar = QtWidgets.QPushButton(parent=self.frame)
         self.confirmar.setGeometry(QtCore.QRect(615, 420, 120, 30))
         self.confirmar.setObjectName('confirmar')
         self.confirmar.clicked.connect(self.realocar)
         self.confirmar.setStyleSheet(colo)
+
         self.label = QtWidgets.QLabel(parent=self.frame)
         self.label.setGeometry(QtCore.QRect(590, 390, 161, 16))
         font = QtGui.QFont()

@@ -1917,6 +1917,8 @@ class Ui_CTI_PED(QtWidgets.QMainWindow):
         self.timer_mysql.timeout.connect(self.atualiza_mysql)
         self.timer_mysql.start()
 
+    #copiadora função auxliar para copiar a tabela em momentos necessários
+
     def copiadora(self):
         conta_linha = self.tabela_grade.rowCount()
         conta_coluna = self.tabela_grade.columnCount()
@@ -1959,6 +1961,7 @@ class Ui_CTI_PED(QtWidgets.QMainWindow):
         self.timer_mysql.stop()
         Form.close()
 
+    # Procura o paciente no aghu
     def procurar_paciente(self):
         import psycopg2
         try:
