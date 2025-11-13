@@ -1,21 +1,61 @@
-# Hospital Bed Management System - Hospital das Clínicas (UFMG)
+🏥 Hospital Bed Management System — Hospital das Clínicas (UFMG)
 
-This repository contains a Hospital Bed Management System developed for the Hospital das Clínicas at UFMG. The system provides efficient tracking and management of bed occupancy, facilitating the coordination between different hospital departments.
+A modern Hospital Bed Management System developed for the Hospital das Clínicas — UFMG, designed to optimize the allocation, monitoring, and coordination of hospital beds.
+The system provides real-time visibility of bed occupancy and integrates seamlessly with the AGHU (University Hospital Management System), ensuring data consistency across all departments.
 
-## Features
-- **Real-Time Bed Availability**: Monitor bed occupancy status in real-time.
-- **Departmental Coordination**: Streamlined coordination for patient transfers and admissions.
-- **AGHU Integration**: Connects seamlessly with the **AGHU** (University Hospital Management System), improving interoperability with other university hospital facilities.
-- **Multi-Database Support**: Supports both **MySQL** and **PostgreSQL** databases for enhanced flexibility.
+✨ Key Features
 
-## Technologies Used
-- **Programming Language**: Python
-- **Framework**: PyQt6 for GUI development
-- **Database**: MySQL and PostgreSQL
-- **External Systems**: Integrated with AGHU for data synchronization
+🛏️ Real-Time Bed Tracking — Instantly view occupied, available, and reserved beds across all wards.
 
-## Installation
+🔄 Departmental Coordination — Simplifies patient transfers and admissions between units.
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/LuisTieres/SGL-HC-UFMG.git
+🔗 AGHU Integration — Fully compatible with AGHU, enabling synchronization with other university hospitals.
+
+🗄️ Multi-Database Architecture — Supports both MySQL and PostgreSQL, allowing flexible deployments.
+
+🖥️ Intuitive Interface (PyQt6) — Built with a clean, responsive, and professional GUI for desktop environments.
+
+(💡 Coming soon: animated previews and system flow GIFs!)
+
+🧠 Technologies Used
+Category	Technology
+Programming Language	Python
+Framework	PyQt6
+Databases	MySQL · PostgreSQL
+External System	AGHU (Hospital Management Integration)
+⚙️ Installation
+
+Clone the repository:
+
+git clone https://github.com/LuisTieres/SGL-HC-UFMG.git
+
+
+Navigate to the project folder:
+
+cd SGL-HC-UFMG
+
+
+Install dependencies:
+
+pip install -r requirements.txt
+
+
+Run the application:
+
+python main.py
+
+🚀 Future Enhancements
+
+🌐 Dashboard with analytics and usage metrics
+
+🔔 Notification system for bed availability changes
+
+🎨 Animated transitions and smooth GUI effects
+
+🧩 API for integration with external hospital systems
+
+🩺 Developed by
+
+Luís Filipe Tieres da Silva
+Hospital das Clínicas — Universidade Federal de Minas Gerais (UFMG)
+💡 Bringing efficiency and technology to healthcare management.
