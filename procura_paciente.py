@@ -6,11 +6,22 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtGui import QIcon
 from PyQt6.QtCore import QSettings, QStandardPaths, Qt
-import mysql.connector
+import pymysql
+import sys
+import os
 
+def resource_path(relative_path):
+    """Resolve path para PyInstaller"""
+    if hasattr(sys, '_MEIPASS'):
+        return os.path.join(sys._MEIPASS, relative_path)
+    return os.path.join(os.path.abspath("."), relative_path)# Verifica se o código foi "congelado" pelo PyInstaller
+
+from database_Demandas import Ui_data_Demanda
 class Ui_Form(object):
 
     def setupUi(self, Form, grade):
+
+        self.data_deman = Ui_data_Demanda()
         self.grade = grade
         self.form = Form
         self.settings = QSettings('HC', 'SGL')
@@ -23,10 +34,9 @@ class Ui_Form(object):
         self.frame.setFrameShape(QtWidgets.QFrame.Shape.StyledPanel)
         self.frame.setFrameShadow(QtWidgets.QFrame.Shadow.Raised)
         self.frame.setObjectName('frame')
-        self.frame.setCursor(Qt.CursorShape.OpenHandCursor)
-        self.frame.mousePressEvent = lambda event, frame=self.frame: self.mousePressEvent_2(event, frame)
-        self.frame.mouseReleaseEvent = lambda event, frame=self.frame: self.mouseReleaseEvent_2(event, frame)
-        self.frame.mouseMoveEvent = lambda event, frame=self.frame: self.mouseMoveEvent_2(event, frame)
+        self.frame.mousePressEvent = lambda event, frame=self.frame: self.mousePressEvent(event, frame)
+        self.frame.mouseReleaseEvent = lambda event, frame=self.frame: self.mouseReleaseEvent(event, frame)
+        self.frame.mouseMoveEvent = lambda event, frame=self.frame: self.mouseMoveEvent(event, frame)
         self.grade.janela_procura = self.frame
         self.PESQUISAR = QtWidgets.QLineEdit(parent=self.frame)
         self.PESQUISAR.setGeometry(QtCore.QRect(30, 60, 421, 31))
@@ -35,7 +45,7 @@ class Ui_Form(object):
         font = QtGui.QFont()
         font.setPointSize(30)
         self.Titulo.setFont(font)
-        icon = QIcon('procurar.ico')
+        icon = QIcon(resource_path('procurar/jogar.ico'))
         pixmap = icon.pixmap(50, 50)
         self.icone = QtWidgets.QLabel(parent=self.frame)
         self.icone.setPixmap(pixmap)
@@ -64,7 +74,7 @@ class Ui_Form(object):
         self.btn_prontuario.setStyleSheet('QPushButton {\n                border: 2px solid #2E3D48;\n                border-radius: 10px;\n                background-color: #FFFFFF;\n                color: #2E3D48;\n            }\n            QPushButton:pressed {\n                background-color: #2E3D48;\n                color: #FFFFFF;\n            }')
         self.btn_prontuario.setObjectName('btn_prontuario')
         self.btn_prontuario.clicked.connect(lambda: self.set_tipo(1))
-        icon = QIcon('lupa.ico')
+        icon = QIcon(resource_path('procurar/lupa.ico'))
         self.PESQUISAR.addAction(icon, QtWidgets.QLineEdit.ActionPosition.LeadingPosition)
         self.label_QT = QtWidgets.QLabel(parent=self.frame)
         self.label_QT.setGeometry(QtCore.QRect(30, 110, 231, 16))
@@ -87,7 +97,7 @@ class Ui_Form(object):
         font.setPointSize(8)
         self.commandLinkButton.setFont(font)
         self.commandLinkButton.setObjectName('commandLinkButton')
-        icon = QtGui.QIcon('C:\\Users\\luist\\OneDrive\\Área de Trabalho\\Ti\\Nova pasta\\HC-UFMG\\SGL\\jogar.ico')
+        icon = QIcon(resource_path('imagens/jogar.ico'))
         self.BTNseta = QtWidgets.QPushButton(parent=self.frame_2)
         self.BTNseta.setStyleSheet('\n                                                    QPushButton {\n                                                        border: none;\n                                                        background-color: transparent;\n                                                        color: #2E3D48;\n                                                    }\n                                                    QPushButton:pressed {\n                                                        background-color: #5DADE2;\n                                                        color: #FFFFFF;\n                                                    }\n                                                ')
         self.BTNseta.setIcon(icon)
@@ -350,77 +360,39 @@ class Ui_Form(object):
     def pesquisa_de(self):
         MainWindow = self.form
         variavel = self.grade.variavel
-        list = [self.grade.abrir_tabela_Alta_CTI, self.grade.abrir_tabela_Hemodinamica, self.grade.abrir_tabela_Agenda_Bloco, self.grade.abrir_tabela_Inter_Tran_Exte, self.grade.abrir_tabela_Tran_Inte, self.grade.abrir_tabela_Onco_Hemato_Ped, self.grade.abrir_tabela_Pronto_Socorro]
         self.quantidade_pacientes = 0
         self.leituras = []
         self.pacientes = []
         self.lugar = []
-        for funcao in list:
-            self.colum_nome = 0
-            self.colum_prontuario = 0
-            self.colum_npf = 0
-            self.grade.procurar_Aberta = False
-            funcao(MainWindow)
-            self.grade.procurar_Aberta = True
-            for colum in range(self.grade.tabelademan.columnCount()):
-                item_pac = self.grade.tabelademan.horizontalHeaderItem(colum)
-                if item_pac.text() == 'NOME DO PACIENTE':
-                    self.colum_nome = colum
-                elif item_pac.text() == 'PRONTUÁRIO':
-                    self.colum_prontuario = colum
-                elif item_pac.text() == 'NPF':
-                    self.colum_npf = colum
-            if self.tipo == 3:
-                for row in range(self.grade.conta_linha()):
-                    item = self.grade.tabelademan.item(row, self.colum_nome)
-                    if item is not None and item.text() == self.PESQUISAR.text():
+        lista_de_Resultados = []
+
+        if self.tipo == 3:
+            lista_de_Resultados = self.data_deman.procurar_paciente_mysql(self.grade, 'NOME_DO_PACIENTE',self.PESQUISAR.text(), lista_de_Resultados)
+            if lista_de_Resultados != False:
+                for resultados, label_titulo,id in lista_de_Resultados:
+                    for dado in resultados:
+                        self.pacientes.append((dado[0], label_titulo, dado[1], dado[2],id))
                         self.quantidade_pacientes += 1
-                        nome_paciente = item.text()
-                        label_titulo = self.grade.labeltitulo.text()
-                        prontuario = self.grade.tabelademan.item(row, self.colum_prontuario).text()
-                        npf = self.grade.tabelademan.item(row, self.colum_npf).text()
-                        self.pacientes.append((nome_paciente, label_titulo, prontuario, npf))
-            if self.tipo == 1:
-                for row in range(self.grade.conta_linha()):
-                    item = self.grade.tabelademan.item(row, self.colum_prontuario)
-                    if item is not None and item.text() == self.PESQUISAR.text():
+        if self.tipo == 1:
+            lista_de_Resultados = self.data_deman.procurar_paciente_mysql(self.grade, 'PRONTUARIO', self.PESQUISAR.text(), lista_de_Resultados)
+            if lista_de_Resultados != False:
+                for resultados, label_titulo,id in lista_de_Resultados:
+                    for dado in resultados:
+                        self.pacientes.append((dado[0], label_titulo, dado[1], dado[2],id))
                         self.quantidade_pacientes += 1
-                        nome_paciente = self.grade.tabelademan.item(row, self.colum_nome).text()
-                        label_titulo = self.grade.labeltitulo.text()
-                        prontuario = self.grade.tabelademan.item(row, self.colum_prontuario).text()
-                        npf = self.grade.tabelademan.item(row, self.colum_npf).text()
-                        self.pacientes.append((nome_paciente, label_titulo, prontuario, npf))
-            if self.tipo == 2:
-                for row in range(self.grade.conta_linha()):
-                    item = self.grade.tabelademan.item(row, self.colum_npf)
-                    if item is not None and item.text() == self.PESQUISAR.text():
+        if self.tipo == 2:
+            lista_de_Resultados = self.data_deman.procurar_paciente_mysql(self.grade, 'NPF', self.PESQUISAR.text(), lista_de_Resultados)
+            if lista_de_Resultados != False:
+                for resultados, label_titulo,id in lista_de_Resultados:
+                    for dado in resultados:
+                        self.pacientes.append((dado[0], label_titulo, dado[1], dado[2],id))
                         self.quantidade_pacientes += 1
-                        nome_paciente = self.grade.tabelademan.item(row, self.colum_nome).text()
-                        label_titulo = self.grade.labeltitulo.text()
-                        prontuario = self.grade.tabelademan.item(row, self.colum_prontuario).text()
-                        npf = self.grade.tabelademan.item(row, self.colum_npf).text()
-                        self.pacientes.append((nome_paciente, label_titulo, prontuario, npf))
-        self.grade.variavel = variavel
-        if self.grade.variavel == 0:
-            self.grade.abrir_tabela_Pronto_Socorro(MainWindow)
-        if self.grade.variavel == 1:
-            self.grade.abrir_tabela_Alta_CTI(MainWindow)
-        if self.grade.variavel == 2:
-            self.grade.abrir_tabela_Agenda_Bloco(MainWindow)
-        if self.grade.variavel == 3:
-            self.grade.abrir_tabela_Hemodinamica(MainWindow)
-        if self.grade.variavel == 4:
-            self.grade.abrir_tabela_Inter_Tran_Exte(MainWindow)
-        if self.grade.variavel == 5:
-            self.grade.abrir_tabela_Tran_Inte(MainWindow)
-        if self.grade.variavel == 6:
-            self.grade.abrir_tabela_Onco_Hemato_Ped(MainWindow)
         self.label_QT.setText(str(self.quantidade_pacientes) + ' PACIENTES ENCONTRADOS')
         self.label_QT.show()
         self.btn_prontuario.hide()
         self.btn_nome.hide()
         self.btn_NPF.hide()
-        if self.quantidade_pacientes != 0:
+        if self.quantidade_pacientes > 1:
             self.nome.show()
             self.ala.show()
             self.leito.show()
@@ -435,20 +407,12 @@ class Ui_Form(object):
 
     def localizar_de(self, Form):
         MainWindow = self.form
-        if self.setor == 'DEMANDAS PRONTO SOCORRO':
-            self.grade.abrir_tabela_Pronto_Socorro(MainWindow)
-        if self.setor == "DEMANDAS ALTA CTI'S":
-            self.grade.abrir_tabela_Alta_CTI(MainWindow)
-        if self.setor == 'DEMANDAS ONCO-HEMATO PED':
-            self.grade.abrir_tabela_Onco_Hemato_Ped(MainWindow)
-        if self.setor == 'DEMANDAS TRANSFERÊNCIAS INTERNAS':
-            self.grade.abrir_tabela_Tran_Inte(MainWindow)
-        if self.setor == 'DEMANDAS INTERNAÇÕES E TRANSF. EXTERNAS':
-            self.grade.abrir_tabela_Inter_Tran_Exte(MainWindow)
-        if self.setor == 'DEMANDAS HEMODINÂMICA':
-            self.grade.abrir_tabela_Hemodinamica(MainWindow)
-        if self.setor == 'DEMANDAS AGENDA BLOCO':
-            self.grade.abrir_tabela_Agenda_Bloco(MainWindow)
+        btn = self.grade.lista_dos_btn[0]
+        for col ,setor in enumerate(self.grade.lista_ids):
+            if self.setor == setor:
+                btn = self.grade.lista_dos_btn[col]
+        ala = self.ala.text().replace('Demanda : ', '')
+        self.grade.abrir_tabela(self.grade.mainwindow,self.setor, ala, btn)
         if self.tipo == 3:
             self.grade.selecionar(self.name, self.tipo)
         if self.tipo == 2:
@@ -462,9 +426,9 @@ class Ui_Form(object):
             if self.contador_linha == index:
                 self.primeiro_paciente = paciente
                 nome = self.primeiro_paciente[0]
-                Prontuario = self.primeiro_paciente[2]
-                self.setor = self.primeiro_paciente[1]
-                npf = self.primeiro_paciente[3]
+                Prontuario = str(self.primeiro_paciente[2])
+                self.setor = self.primeiro_paciente[4]
+                npf = str(self.primeiro_paciente[3])
                 ala = self.primeiro_paciente[1]
                 self.nome.setText('Nome: ' + nome)
                 self.prontuario.setText('Prontuário: ' + Prontuario)
@@ -481,9 +445,9 @@ class Ui_Form(object):
             if self.contador_linha == index and self.contador_linha > 0:
                 self.primeiro_paciente = paciente
                 nome = self.primeiro_paciente[0]
-                Prontuario = self.primeiro_paciente[2]
-                self.setor = self.primeiro_paciente[1]
-                npf = self.primeiro_paciente[3]
+                Prontuario = str(self.primeiro_paciente[2])
+                self.setor = self.primeiro_paciente[4]
+                npf = str(self.primeiro_paciente[3])
                 ala = self.primeiro_paciente[1]
                 self.nome.setText('Nome: ' + nome)
                 self.prontuario.setText('Prontuário: ' + Prontuario)
@@ -511,17 +475,17 @@ class Ui_Form(object):
                 label.setStyleSheet(f'color: {color}; font:  {tamanho}px {font_name}; border:none')
             self.Titulo.setStyleSheet(f'color: {color}; font:  30 px {font_name}; border:none;')
 
-    def mousePressEvent_2(self, event, centralwidget):
+    def mousePressEvent(self, event, centralwidget):
         if event.button() == Qt.MouseButton.LeftButton:
-            centralwidget.setCursor(Qt.CursorShape.ClosedHandCursor)
-        centralwidget.mouse_offset = event.pos()
+            # centralwidget.setCursor(Qt.CursorShape.ClosedHandCursor)  # Removido
+            centralwidget.mouse_offset = event.pos()
 
-    def mouseReleaseEvent_2(self, event, centralwidget):
+    def mouseReleaseEvent(self, event, centralwidget):
         if event.button() == Qt.MouseButton.LeftButton:
-            centralwidget.setCursor(Qt.CursorShape.OpenHandCursor)
+            # centralwidget.setCursor(Qt.CursorShape.OpenHandCursor)  # Removido
+            centralwidget.setCursor(Qt.CursorShape.ArrowCursor)  # Garante que volta para a seta
 
-    def mouseMoveEvent_2(self, event, centralwidget):
+    def mouseMoveEvent(self, event, centralwidget):
         if event.buttons() == Qt.MouseButton.LeftButton:
             new_pos = centralwidget.mapToParent(event.pos() - centralwidget.mouse_offset)
             centralwidget.move(new_pos)
-            x, y = (new_pos.x(), new_pos.y())

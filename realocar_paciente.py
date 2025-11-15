@@ -1,6 +1,6 @@
 from PyQt6.QtGui import QIcon
 from PyQt6.QtWidgets import QMessageBox, QTableWidget, QComboBox
-import mysql.connector
+import pymysql
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtCore import QDateTime, Qt, QRect, QSettings, QStandardPaths, QPoint
 
@@ -252,7 +252,7 @@ class Ui_Form(object):
                         current_datetime = QDateTime.currentDateTime()
                         formatted_datetime = current_datetime.toString('dd/MM/yyyy hh:mm:ss')
                         status = 'RESERVADO'
-                        conexao = mysql.connector.connect(host='10.36.0.32', user='sglHC2024', password='S4g1L81', database='sgl')
+                        conexao = pymysql.connect(host='10.36.0.32', user='sglHC2024', password='S4g1L81', database='sgl')
                         if self.dep == 'PS':
                             cursor = conexao.cursor()
                             comando = f'UPDATE tabela_demanda_ps SET STATUS_SOLICITACAO = "{status}", LEITO_RESERVADO = "{leito.text()}", DATA_HORA_RESERVA = "{formatted_datetime}" WHERE NOME = "{nome.text()}"'
@@ -290,7 +290,7 @@ class Ui_Form(object):
                             conexao.commit()
                         cursor.close()
                         conexao.close()
-                        conexao = mysql.connector.connect(host='10.36.0.32', user='sglHC2024', password='S4g1L81', database='sgl')
+                        conexao = pymysql.connect(host='10.36.0.32', user='sglHC2024', password='S4g1L81', database='sgl')
                         cursor = conexao.cursor()
                         comando = f'UPDATE GRADE SET NOME = "{nome.text()}", STATUS_DO_LEITO = "{status}", DATA_DE_NASCIMENTO = "{data_nas.text()}" WHERE LEITO = "{leito.text()}"'
                         cursor.execute(comando)
@@ -311,7 +311,7 @@ class Ui_Form(object):
 
     def atualiza_tela(self, dep, Form):
         self.dep = dep
-        conexao = mysql.connector.connect(host='10.36.0.32', user='sglHC2024', password='S4g1L81', database='sgl')
+        conexao = pymysql.connect(host='10.36.0.32', user='sglHC2024', password='S4g1L81', database='sgl')
         if dep == 'PS':
             cursor = conexao.cursor()
             comando = 'SELECT * FROM tabela_demanda_ps'

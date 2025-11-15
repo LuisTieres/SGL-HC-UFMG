@@ -305,7 +305,6 @@ class Ui_Form(object):
         self.label_vago1_3.setStyleSheet('\nborder: transparent;background-color: rgb(255, 255, 255);')
         self.label_vago1_3.setObjectName('label_vago1_3')
         self.labels = []
-        print(16)
         for row in range(1, 33):
             label = QLabel(f'Leito {row}', self.frame_4)
             label.setGeometry(0, 20, 60, 25)
@@ -322,7 +321,7 @@ class Ui_Form(object):
                             label.setGeometry(x, y, 70, 25)
                             break
             except FileNotFoundError:
-                print("File not found:", filename)
+                print(f"Arquivo {filename} não encontrado. Usando posição padrão.")
 
             label.setAlignment(Qt.AlignmentFlag.AlignCenter)
             label.setCursor(Qt.CursorShape.OpenHandCursor)
@@ -351,7 +350,6 @@ class Ui_Form(object):
             label.move(new_pos)
             x, y = (new_pos.x(), new_pos.y())
             frame = self.frame_4
-            print(y)
             if frame:
                 frame_rect = frame.rect()
                 new_pos.setX(max(frame_rect.left(), min(new_pos.x(), frame_rect.right() - label.width())))

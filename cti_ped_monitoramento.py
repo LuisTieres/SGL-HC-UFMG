@@ -6,7 +6,6 @@ import csv
 
 class Ui_Form(object):
     def setupUi(self, Form, frame, tela):
-        print(21)
         self.tela = tela
         self.settings = QSettings('HC', 'SGL')
         self.form = Form
@@ -311,15 +310,18 @@ class Ui_Form(object):
         self.lisa = self.tela.retornar_frame()
         if self.tela.scroll_painel.isVisible() or self.tela.help_sccrol_painel == True:
             self.tela.monitora = False
-            self.tela.abri_cti(Form, 'CTI PEDIÁTRICO - 06N')
-
+           # self.tela.abri_cti(Form, 'CTI PEDIÁTRICO - 06N')
+            for cont, id in enumerate(self.tela.lista_titulo):
+                if id == 'CTI PEDIÁTRICO - 06N':
+                    self.tela.abri_cti(Form, self.tela.lista_ids[cont], self.tela.lista_titulo[cont], self.tela.lista_dos_btn[cont])
+                    break
         for row in range(self.tela.conta_linha()):
             leito = self.tela.leito(row)
 
             if 'aguardando' in leito.text():
                 continue
 
-            icon = QtGui.QIcon('emergencia.ico')
+            icon = QtGui.QIcon('imagens/emergencia.ico')
             pixmap = icon.pixmap(40, 40)
 
             if self.tela.scroll_painel.isVisible() or self.tela.help_sccrol_painel == True:
@@ -345,17 +347,18 @@ class Ui_Form(object):
                             label.setGeometry(x, y, 60, 30)
                             break
 
-                    label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-                    label.setCursor(Qt.CursorShape.OpenHandCursor)
-                    label.mousePressEvent = lambda event, label_aux=label: self.mousePressEvent(event, label_aux)
-                    label.mouseReleaseEvent = lambda event, label_aux=label: self.mouseReleaseEvent(event, label_aux)
-                    label.mouseMoveEvent = lambda event, label_aux=label: self.mouseMoveEvent(event, label_aux)
-                    label.setStyleSheet('background-color: rgb(170, 255, 255);')
-                    self.lisa.append(label)
+
 
             except FileNotFoundError:
-                print(1)
+                print("Arquivo não encontrado, criando novo arquivo.")
+            label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            label.setCursor(Qt.CursorShape.OpenHandCursor)
+            label.mousePressEvent = lambda event, label_aux=label: self.mousePressEvent(event, label_aux)
+            label.mouseReleaseEvent = lambda event, label_aux=label: self.mouseReleaseEvent(event, label_aux)
+            label.mouseMoveEvent = lambda event, label_aux=label: self.mouseMoveEvent(event, label_aux)
+            label.setStyleSheet('background-color: rgb(170, 255, 255);')
 
+            self.lisa.append(label)
             self.atualizar_monitoramento(Form)
             self.conf_layout()
 

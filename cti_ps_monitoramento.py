@@ -224,13 +224,18 @@ class Ui_Form(object):
         self.labels = []
         if self.tela.scroll_painel.isVisible() or self.tela.help_sccrol_painel == True:
             self.tela.monitora = False
-            self.tela.abri_cti(Form, 'UTI - PRONTO SOCORRO')
+            #self.tela.abri_cti(Form, 'UTI - PRONTO SOCORRO')
 
+            for cont, id in enumerate(self.tela.lista_titulo):
+                if id == 'UTI - PRONTO SOCORRO':
+                    self.tela.abri_cti(Form, self.tela.lista_ids[cont], self.tela.lista_titulo[cont], self.tela.lista_dos_btn[cont])
+                    break
         for row in range(self.tela.conta_linha()):
             leito = self.tela.leito(row)
-            icon = QtGui.QIcon('emergencia.ico')
+            icon = QtGui.QIcon('imagens/emergencia.ico')
             pixmap = icon.pixmap(40, 40)
-
+            if 'aguardando' in leito.text():
+                continue
             if self.tela.scroll_painel.isVisible() or self.tela.help_sccrol_painel:
                 label = QLabel(leito.text(), self.frame)
             else:
@@ -251,16 +256,18 @@ class Ui_Form(object):
                             y = int(data[row][2])
                             label.setGeometry(x, y, 60, 30)
                             break
-                    label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-                    label.setCursor(Qt.CursorShape.OpenHandCursor)
-                    label.mousePressEvent = lambda event, label_aux=label: self.mousePressEvent(event, label_aux)
-                    label.mouseMoveEvent = lambda event, label_aux=label: self.mouseMoveEvent(event, label_aux)
-                    label.setStyleSheet('background-color: rgb(170, 255, 255);')
-                    self.labels.append(label)
+
 
             except FileNotFoundError:
-                print("Arquivo não encontrado")
+                print("Arquivo não encontrado. Usando posição padrão.")
 
+            label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            label.setCursor(Qt.CursorShape.OpenHandCursor)
+            label.mousePressEvent = lambda event, label_aux=label: self.mousePressEvent(event, label_aux)
+            label.mouseMoveEvent = lambda event, label_aux=label: self.mouseMoveEvent(event, label_aux)
+            label.setStyleSheet('background-color: rgb(170, 255, 255);')
+
+            self.labels.append(label)
             self.atualizar_monitoramento(Form)
             self.conf_layout()
             if self.tela.scroll_painel.isVisible() or self.tela.help_sccrol_painel:

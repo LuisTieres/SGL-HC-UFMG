@@ -1,5 +1,5 @@
 from PyQt6.QtWidgets import QApplication, QRadioButton, QComboBox, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QMessageBox
-import mysql.connector
+import pymysql
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtCore import QSettings, QStandardPaths, Qt
 import psycopg2
@@ -61,15 +61,15 @@ class Ui_Form(QMainWindow):
     def create_table(self):
         table_name = self.table_name_input.text()
         try:
-            connection = mysql.connector.connect(host='10.36.0.32', user='sglHC2024', password='S4g1L81', database='sgl')
-            cursor = connection.cursor()
+            conexao = pymysql.connect(host='10.36.0.32', user='sglHC2024', password='S4g1L81', database='sgl')
+            cursor = conexao.cursor()
             print(table_name)
             comando = f"INSERT INTO New_GRADES (tabelas) VALUES ('{table_name}')"
             cursor.execute(comando)
-            connection.commit()
-            connection.close()
+            conexao.commit()
+            conexao.close()
             self.show_message('Sucesso', 'Tabela criada com sucesso!')
-        except mysql.connector.Error as e:
+        except pymysql.connector.Error as e:
             self.show_message('Erro', f'Erro ao criar tabela: {e}')
 
     def show_message(self, title, message):

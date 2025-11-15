@@ -517,10 +517,16 @@ class Ui_Form(object):
         self.lisa = self.tela.retornar_frame()
         if self.tela.help_sccrol_painel == True:
             self.tela.monitora = False
-            self.tela.abri_cti(Form, 'UNIDADE DE INTERNAÇÃO - 07L')
+            # self.tela.abri_cti(Form, 'UNIDADE DE INTERNAÇÃO - 07L')
+            for cont, id in enumerate(self.tela.lista_titulo):
+                if id == 'UNIDADE DE INTERNAÇÃO - 07L':
+                    self.tela.abri_cti(Form, self.tela.lista_ids[cont], self.tela.lista_titulo[cont], self.tela.lista_dos_btn[cont])
+                    break
         for row in range(self.tela.conta_linha()):
             leito = self.tela.leito(row)
 
+            if 'aguardando' in leito.text():
+                continue
             if self.tela.help_sccrol_painel:
                 label = QLabel(leito.text(), self.frame_tela)
             else:
@@ -544,7 +550,7 @@ class Ui_Form(object):
                             label.setGeometry(x, y, 60, 30)
                             break
             except FileNotFoundError:
-                pass
+                print('Arquivo não encontrado:', filename)
 
             label.setAlignment(Qt.AlignmentFlag.AlignCenter)
             label.setCursor(Qt.CursorShape.OpenHandCursor)

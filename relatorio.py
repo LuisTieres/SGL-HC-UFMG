@@ -1,20 +1,32 @@
-# Decompiled with PyLingual (https://pylingual.io)
-# Internal filename: relatorio.py
-# Bytecode version: 3.12.0rc2 (3531)
-# Source timestamp: 1970-01-01 00:00:00 UTC (0)
-
 from PyQt6.QtCore import Qt, QSettings, QStandardPaths, QTimer, QTime, QDateTime, QDate
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtGui import QGuiApplication
 from PyQt6.QtWidgets import QApplication, QFileDialog, QTableWidget, QTableWidgetItem, QComboBox, QLabel, QVBoxLayout, QWidget, QTimeEdit
 from openpyxl import Workbook
 from openpyxl import load_workbook
-import mysql.connector
+import pymysql
 import psycopg2
+from database_Demandas import Ui_data_Demanda
+from PyQt6.QtCore import QDate
+from datetime import datetime
+from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QDateEdit
+from PyQt6.QtCore import QDate
+from datetime import datetime, timedelta
+FORMATOS_DATA_HORA = [
+        "%Y-%m-%d %H:%M:%S",
+        "%d/%m/%Y %H:%M",
+        "%Y-%m-%d %H:%M",
+        "%d/%m/%Y %H:%M:%S",
+        "%d-%m-%Y %H:%M",
+        "%d-%m-%Y %H:%M:%S"
+    ]
 
 class Ui_Form(object):
 
     def setupUi(self, Form, frame, tela):
+        self.porcentagem = 0
+        self.total_hora = 0
+        self.data_deman = Ui_data_Demanda()
         self.tela = tela
         self.frame = frame
         self.settings = QSettings('HC', 'SGL')
@@ -27,11 +39,34 @@ class Ui_Form(object):
         tabela_width = size.width() - 226
         tabela_height = size.height() - 338
         self.tabela_relatorio = QtWidgets.QTableWidget(parent=self.frame)
-        self.tabela_relatorio.setGeometry(QtCore.QRect(40, 30, tabela_width, tabela_height))
+        self.tabela_relatorio.setGeometry(QtCore.QRect(40, 60, tabela_width, tabela_height))
         self.tabela_relatorio.setObjectName('tableWidget')
         self.tabela_relatorio.setStyleSheet('background-color: rgb(255, 255, 255);gridline-color: black;')
-        self.tabela_relatorio.setColumnCount(11)
+        self.tabela_relatorio.setColumnCount(7)
         self.tabela_relatorio.setRowCount(0)
+
+        self.label_pocentagem_de_meta = QtWidgets.QLabel(parent=self.frame)
+        self.label_pocentagem_de_meta.setGeometry(QtCore.QRect(40, 90 + tabela_height, 500, 50))
+        self.label_pocentagem_de_meta.show()
+
+        self.label_hora_meta = QtWidgets.QLabel(parent=self.frame)
+        self.label_hora_meta.setGeometry(QtCore.QRect(560, 90 + tabela_height, 500, 25))
+        self.label_hora_meta.show()
+
+        self.btn_voltar = QtWidgets.QPushButton('VOLTAR',parent=self.frame)
+        self.btn_voltar.setGeometry(QtCore.QRect(5, 5, 50, 30))
+        self.btn_voltar.show()
+        self.btn_voltar.clicked.connect(self.tela.voltar_normal)
+        self.btn_voltar.setStyleSheet("QPushButton{\n"
+                                      "background-color: rgb(0, 0, 0);\n"
+                                      "    color: rgb(255, 255, 255);\n"
+                                      "    border-radius:10px;\n"
+                                      "}\n"
+                                      "QPushButton:hover{\n"
+                                      "    background-color: rgb(255, 255, 255);\n"
+                                      "    color: rgb(0, 0, 0);\n"
+                                      "}")
+
         item = QtWidgets.QTableWidgetItem()
         self.tabela_relatorio.setHorizontalHeaderItem(0, item)
         item = QtWidgets.QTableWidgetItem()
@@ -46,19 +81,13 @@ class Ui_Form(object):
         self.tabela_relatorio.setHorizontalHeaderItem(5, item)
         item = QtWidgets.QTableWidgetItem()
         self.tabela_relatorio.setHorizontalHeaderItem(6, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tabela_relatorio.setHorizontalHeaderItem(7, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tabela_relatorio.setHorizontalHeaderItem(8, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tabela_relatorio.setHorizontalHeaderItem(9, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tabela_relatorio.setHorizontalHeaderItem(10, item)
+
         self.tabela_relatorio.horizontalHeader().setDefaultSectionSize(211)
         self.tabela_relatorio.horizontalHeader().setMinimumSectionSize(65)
         self.tabela_relatorio.verticalHeader().setCascadingSectionResizes(True)
         self.tabela_relatorio.verticalHeader().setDefaultSectionSize(30)
         self.tabela_relatorio.verticalHeader().setMinimumSectionSize(41)
+
         self.list_tempo_inicial = []
         screen = QGuiApplication.primaryScreen()
         size = screen.size()
@@ -72,16 +101,40 @@ class Ui_Form(object):
         self.btn_dowload_relatotio.setStyleSheet('\n                        QPushButton {\n                            border: 2px solid #2E3D48;\n                            border-radius: 10px;\n                            background-color: #FFFFFF;\n                            color: #2E3D48;\n                        }\n\n                        QPushButton:hover {\n                            background-color: #DDDDDD;  /* Change this to your desired hover color */\n                            color: rgb(0, 0, 0);\n                        }\n\n                        QPushButton:pressed {\n                            background-color: #2E3D48;  /* Change this to your desired pressed color */\n                            color: #FFFFFF;\n                        }\n                    ')
         for widget in self.frame.findChildren(QtWidgets.QWidget):
             widget.show()
+
+        self.data_edit = QDateEdit( parent=self.frame)
+        self.data_edit.setGeometry(QtCore.QRect(60, 10, 150, 25))
+        self.data_edit.setDisplayFormat("MM/yyyy")  # Mostra apenas mês/ano
+        self.data_edit.setDate(QDate.currentDate())
+        self.data_edit.show()
+
+        self.timer_edit = QtWidgets.QTimeEdit(parent=self.frame)
+        self.timer_edit.setGeometry(QtCore.QRect(240, 10, 150, 25))
+        self.timer_edit.setDisplayFormat("HH:mm:ss")
+        self.timer_edit.setTime(QtCore.QTime(4, 59, 59))
+        self.timer_edit.show()
+
+        self.numero_edit = QtWidgets.QDoubleSpinBox(parent=self.frame)
+        self.numero_edit.setGeometry(QtCore.QRect(420, 10, 150, 25))
+        self.numero_edit.setSuffix(" %")  # Sufixo de porcentagem
+        self.numero_edit.setValue(75.0)  # Valor inicial
+        self.numero_edit.setRange(0.0, 100.0)  # Faixa de 0% a 100%
+        self.numero_edit.show()
+
+        self.data_edit.dateChanged.connect(self.atualizar_relatorio)
+        self.timer_edit.timeChanged.connect(self.atualizar_relatorio)
+        self.numero_edit.valueChanged.connect(self.atualizar_relatorio)
+
         self.retranslateUi(Form)
         self.atualizar_relatorio()
         self.timer = QTimer()
-        self.timer.timeout.connect(self.atualizar_tempo)
+        #self.timer.timeout.connect(self.atualizar_tempo)
         self.timer.start(1000)
         self.tempo_decorrido = 0
-        self.tabela_relatorio.horizontalHeader().sectionClicked.connect(self.mostrar_showTimeEdit)
+        #self.tabela_relatorio.horizontalHeader().sectionClicked.connect(self.mostrar_showTimeEdit)
         self.timeEdit = None
         self.timeEdit_10 = None
-        self.atualizar_ocupacao()
+        #self.atualizar_ocupacao()
 
     def mostrar_showTimeEdit(self, logicalIndex):
         if logicalIndex == 9:
@@ -137,46 +190,183 @@ class Ui_Form(object):
             item.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
             self.tabela_relatorio.setItem(row, 5, item)
 
+    def descobrir_nome_coluna(self, nome, coluna):
+        for col in range(self.tabela_relatorio.columnCount()):
+            item_pac = self.tabela_relatorio.horizontalHeaderItem(col)
+            if item_pac is not None:
+                if item_pac.text() == nome:
+                    return col
+        return coluna
     def atualizar_relatorio(self):
-        conexao = mysql.connector.connect(host='10.36.0.32', user='sglHC2024', password='S4g1L81', database='sgl')
-        cursor = conexao.cursor()
-        comando = 'SELECT * FROM alta_cti'
-        cursor.execute(comando)
-        leitura = cursor.fetchall()
-        self.tabela_relatorio.clearContents()
+        contador_Sim = 0
+        contador_tempo = 0
+        coluna_data_alta = self.data_deman.pegar_coluna_Demanda(self, 'alta_cti', 'DATA DA ALTA')
+        coluna_hora_alta = self.data_deman.pegar_coluna_Demanda(self, 'alta_cti', 'HORA DE SOLICITAÇÃO DA ALTA')
+        coluna_nome_alta = self.data_deman.pegar_coluna_Demanda(self, 'alta_cti', 'NOME DO PACIENTE')
+        coluna_conf_alta = self.data_deman.pegar_coluna_Demanda(self, 'alta_cti', 'DATA E HORÁRIO DA CONFIRMAÇÃO DA ALTA')
+        coluna_stat_alta = self.data_deman.pegar_coluna_Demanda(self, 'alta_cti', 'STATUS DA SOLICITAÇÃO')
+
+        coluna_data = "col" if coluna_data_alta == 0 else f"col{coluna_data_alta}"
+        coluna_hora = "col" if coluna_hora_alta == 0 else f"col{coluna_hora_alta}"
+        coluna_nome = "col" if coluna_nome_alta == 0 else f"col{coluna_nome_alta}"
+        coluna_conf = "col" if coluna_conf_alta == 0 else f"col{coluna_conf_alta}"
+        coluna_stat = "col" if coluna_stat_alta == 0 else f"col{coluna_stat_alta}"
+
+        dado_data = self.data_deman.pegar_Dados_Demanda(self,'alta_cti', coluna_data)
+        dado_hora = self.data_deman.pegar_Dados_Demanda(self,'alta_cti', coluna_hora)
+        dado_nome = self.data_deman.pegar_Dados_Demanda(self,'alta_cti', coluna_nome)
+        dado_conf = self.data_deman.pegar_Dados_Demanda(self,'alta_cti', coluna_conf)
+        dado_stat = self.data_deman.pegar_Dados_Demanda(self,'alta_cti', coluna_stat)
+
+        print('mano',dado_conf,dado_data,dado_hora,dado_nome,dado_stat)
+
+        x = self.timer_edit.time()
+        coluna_nome_tabela = self.descobrir_nome_coluna('NOME DO PACIENTE',None)
+        coluna_data_tabela = self.descobrir_nome_coluna('DATA DA ALTA',None)
+        coluna_hora_tabela = self.descobrir_nome_coluna('HORA DE SOLICITAÇÃO DA ALTA',None)
+        coluna_conf_tabela = self.descobrir_nome_coluna('DATA E HORÁRIO DA CONFIRMAÇÃO DA ALTA',None)
+        coluna_stat_tabela = self.descobrir_nome_coluna('STATUS DA SOLICITAÇÃO',None)
+        coluna_temo_libera = self.descobrir_nome_coluna('TEMPO DE LIBERAÇÃO DE LEITO PARA ALTAS DO CTI:         ', None)
+
+        hora_formatada = self.timer_edit.time()
+        x = hora_formatada.toString("HH:mm:ss")
+        coluna_analise_libera = self.descobrir_nome_coluna(f"LIBERADO ANTES DE {x} ", None)
+
         self.tabela_relatorio.setRowCount(0)
-        for linha in leitura:
-            linha11 = linha[11]
-            if linha[11] is not None and linha11 == 'ALTA CONFIRMADA':
-                row = self.tabela_relatorio.rowCount()
-                self.tabela_relatorio.insertRow(row)
-                lista = [3, 13, 5, 10, 15, 11]
-                posicao = 0
-                for numero in lista:
-                    item = QtWidgets.QTableWidgetItem(linha[numero])
-                    item.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-                    if item is None:
-                        item = QtWidgets.QTableWidgetItem(str(''))
-                    item.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-                    self.tabela_relatorio.setItem(row, posicao, item)
-                    posicao += 1
-                    if numero == 15:
-                        posicao += 1
-        for row in range(self.tabela_relatorio.rowCount()):
-            if 'RESERVA' in self.tabela_relatorio.item(row, 6).text() or 'OCUPADO' in self.tabela_relatorio.item(row, 6).text():
-                tempo = QDateTime.fromString(f'{leitura[row][12]} {leitura[row][13]}', 'dd/MM/yyyy hh:mm:ss')
-                tempo_atual = QDateTime.fromString(f'{leitura[row][17]}', 'dd/MM/yyyy hh:mm:ss')
-                diferenca = tempo.secsTo(tempo_atual)
-                tempo_decorrido = QTime(0, 0).addSecs(diferenca).toString('hh:mm:ss')
-                item = QtWidgets.QTableWidgetItem(tempo_decorrido)
-                item.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-                self.tabela_relatorio.setItem(row, 5, item)
+        for cont , nome in enumerate(dado_nome):
+            if len(dado_nome) < 1 or dado_nome[cont] is None:
+                continue
+
+            if len(dado_conf) < 1 or dado_conf[cont] is None:
+                data_str = ''
             else:
-                self.list_tempo_inicial.append((row, QDateTime.fromString(f'{leitura[row][12]} {leitura[row][13]}', 'dd/MM/yyyy hh:mm:ss')))
-        cursor.close()
-        conexao.close()
-        self.atualizar_tempo()
-        self.analise_alta_meta()
+                data_str = dado_conf[cont]
+
+            if len(dado_data) < 1 or dado_data[cont] is None:
+                dado_data_str = ''
+            else:
+                dado_data_str = dado_data[cont]
+
+            if len(dado_hora) < 1 or dado_hora[cont] is None:
+                dado_hora_str = ''
+            else:
+                dado_hora_str = dado_hora[cont]
+
+            if len(dado_stat) < 1 or dado_stat[cont] is None:
+                dado_stat_str = ''
+            else:
+                dado_stat_str = dado_stat[cont]
+
+            data_usuario = self.data_edit.date()
+            mes_usuario = data_usuario.month()
+            ano_usuario = data_usuario.year()
+
+            if data_str != '':
+                if isinstance(data_str, str):
+                    try:
+                        data_dt = datetime.strptime(data_str, "%Y-%m-%d %H:%M:%S")
+                    except ValueError:
+                        try:
+                            data_dt = datetime.strptime(data_str, "%d/%m/%Y %H:%M")
+                        except ValueError:
+                            print(f"Formato de data inválido: {data_str}")
+                            continue  # ou levante erro, dependendo do seu caso
+                else:
+                    data_dt = data_str
+
+                mes_lista = data_dt.month
+                ano_lista = data_dt.year
+
+                if mes_usuario != mes_lista or ano_usuario != ano_lista:
+                    continue
+
+            row = self.tabela_relatorio.rowCount()
+            self.tabela_relatorio.insertRow(row)
+
+            def fazer_item(text):
+                item = QtWidgets.QTableWidgetItem(text)
+                item.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+                if item is None:
+                    item = QtWidgets.QTableWidgetItem(str(''))
+                item.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+                return item
+
+            self.tabela_relatorio.setItem(row, coluna_nome_tabela, fazer_item(nome))
+            self.tabela_relatorio.setItem(row, coluna_data_tabela, fazer_item(dado_data_str))
+            self.tabela_relatorio.setItem(row, coluna_hora_tabela, fazer_item(dado_hora_str))
+            self.tabela_relatorio.setItem(row, coluna_conf_tabela, fazer_item(data_str))
+            self.tabela_relatorio.setItem(row, coluna_stat_tabela, fazer_item(dado_stat_str))
+
+            diferenca = self.calcular_diferenca(dado_data_str,dado_hora_str,data_str)
+            if diferenca is not None:
+                print(f"Diferença: {diferenca}")
+                self.tabela_relatorio.setItem(row, coluna_temo_libera, fazer_item(diferenca))
+
+                def string_para_segundos(hhmmss: str) -> int:
+                    h, m, s = map(int, hhmmss.split(":"))
+                    return h * 3600 + m * 60 + s
+
+                contador_tempo += string_para_segundos(diferenca)
+
+                def string_para_timedelta(horario_str):
+                    h, m, s = map(int, horario_str.split(":"))
+                    return timedelta(hours=h, minutes=m, seconds=s)
+
+                diferenca_tempo = string_para_timedelta(diferenca)
+                tempo_qt = self.timer_edit.time()
+                tempo_limite = timedelta(hours=tempo_qt.hour(), minutes=tempo_qt.minute(), seconds=tempo_qt.second())
+
+                if diferenca_tempo > tempo_limite:
+                    print("Passou do tempo limite.")
+                    self.tabela_relatorio.setItem(row, coluna_analise_libera, fazer_item('NÃO'))
+                else:
+                    print("Está dentro do limite.")
+                    self.tabela_relatorio.setItem(row, coluna_analise_libera, fazer_item('SIM'))
+                    contador_Sim+=1
+            else:
+                print("Não foi possível calcular a diferença.")
+
+        valor = self.numero_edit.value()
+        if self.tabela_relatorio.rowCount() > 0:
+            if contador_tempo > 0:
+                contador_tempo = contador_tempo / self.tabela_relatorio.rowCount()
+                horas = int(contador_tempo // 3600)
+                minutos = int((contador_tempo % 3600) // 60)
+                segundos = int(contador_tempo % 60)
+                tempo_formatado = f"{horas:02}:{minutos:02}:{segundos:02}"
+
+                self.total_hora = tempo_formatado
+                self.label_hora_meta.setText(f'MÉDIA DE LIBERAÇÃO DE LEITO PARA AS ALTAS DO CTI POR MÊS: {tempo_formatado}')
+            self.label_pocentagem_de_meta.setText(f'% Liberação de Alta \n- Meta: {valor} % - \n- Porcentagem Real: {(contador_Sim / self.tabela_relatorio.rowCount())*100} % -')
+            self.porcentagem = (contador_Sim / self.tabela_relatorio.rowCount())*100
+
+    def parse_datetime_flexivel(self,data_str):
+        for formato in FORMATOS_DATA_HORA:
+            try:
+                return datetime.strptime(data_str.strip(), formato)
+            except (ValueError, AttributeError):
+                continue
+        print(f"Formato de data inválido: {data_str}")
+        return None
+
+    def calcular_diferenca(self,data_alta,hora_alta,data_confirmacao):
+        # Pegando os dados da linha
+
+        # Concatenando data + hora para formar o datetime da alta
+        datetime_alta = self.parse_datetime_flexivel(f"{data_alta} {hora_alta}")
+        datetime_confirmacao = self.parse_datetime_flexivel(data_confirmacao)
+
+        if datetime_alta and datetime_confirmacao:
+            diferenca = datetime_confirmacao - datetime_alta
+            total_segundos = int(diferenca.total_seconds())
+
+            horas = total_segundos // 3600
+            minutos = (total_segundos % 3600) // 60
+            segundos = total_segundos % 60
+
+            return f"{horas:02}:{minutos:02}:{segundos:02}"
+        else:
+            return None
 
     def analise_alta_meta(self):
         for row in range(self.tabela_relatorio.rowCount()):
@@ -268,7 +458,7 @@ class Ui_Form(object):
         self.cont_ocupado_enf = 0
         self.total_enf = 0
         list = ['CTI PEDIÁTRICO - 06N', 'UNIDADE DE INTERNAÇÃO CORONARIANA - 03N', 'UTI - PRONTO SOCORRO', 'CTI ADULTO - 03L', 'UNIDADE DE INTERNAÇÃO - 06L', 'UNIDADE DE INTERNAÇÃO - 10N', 'UNIDADE DE INTERNAÇÃO - 02L', 'UNIDADE DE INTERNAÇÃO - 02S', 'UNIDADE DE INTERNAÇÃO - 07L', 'UNIDADE DE INTERNAÇÃO - 07N', 'UNIDADE DE INTERNAÇÃO - 08S', 'UNIDADE DE INTERNAÇÃO - 08L', 'UNIDADE DE INTERNAÇÃO - 08N', 'UNIDADE DE INTERNAÇÃO - 09L']
-        conexao = mysql.connector.connect(host='10.36.0.32', user='sglHC2024', password='S4g1L81', database='sgl')
+        conexao = pymysql.connect(host='10.36.0.32', user='sglHC2024', password='S4g1L81', database='sgl')
         cursor = conexao.cursor()
         comando = 'SELECT idNew_GRADES FROM New_GRADES '
         cursor.execute(comando)
@@ -316,7 +506,7 @@ class Ui_Form(object):
         connection.close()
 
     def conferir_ocupacao_cti(self, dados):
-        conexao = mysql.connector.connect(host='10.36.0.32', user='sglHC2024', password='S4g1L81', database='sgl')
+        conexao = pymysql.connect(host='10.36.0.32', user='sglHC2024', password='S4g1L81', database='sgl')
         cursor = conexao.cursor()
         comando = f'SELECT STATUS_DO_LEITO FROM GRADE WHERE idGRADE = "{dados}"'
         cursor.execute(comando)
@@ -329,7 +519,7 @@ class Ui_Form(object):
         conexao.close()
 
     def conferir_ocupacao_enfermaria(self, dados):
-        conexao = mysql.connector.connect(host='10.36.0.32', user='sglHC2024', password='S4g1L81', database='sgl')
+        conexao = pymysql.connect(host='10.36.0.32', user='sglHC2024', password='S4g1L81', database='sgl')
         cursor = conexao.cursor()
         comando = f"SELECT SEXO DA ENFERMARIA FROM GRADE WHERE idGRADE = '{dados}'"
         cursor.execute(comando)
@@ -365,12 +555,21 @@ class Ui_Form(object):
             from openpyxl.styles import Font
             wb = Workbook()
             ws = wb.active
-            widths = [35, 45, 35, 45, 35, 70, 35, 60, 70, 60, 60]
+            valor = self.numero_edit.value()
+
+            widths = [35, 45, 35, 45, 60, 80, 80, 80, 90, 60, 60]
+            titulo1= 'MÉDIA DE LIBERAÇÃO DE LEITO PARA AS ALTAS DO CTI POR MÊS'
+            titulo2 =  f'% Liberação de Alta - Meta {valor}%'
+
             for i, width in enumerate(widths, start=1):
                 ws.column_dimensions[chr(64 + i)].width = width
             for col in range(0, self.tabela_relatorio.columnCount()):
                 item = self.tabela_relatorio.horizontalHeaderItem(col)
                 ws.cell(row=1, column=col + 1, value=item.text())
+            ws.cell(row=1, column=col + 2, value=titulo1)
+            ws.cell(row=1, column=col + 3, value=titulo1)
+
+
             for row in range(0, self.tabela_relatorio.rowCount()):
                 for col in range(0, self.tabela_relatorio.columnCount()):
                     item = self.tabela_relatorio.item(row, col)
@@ -379,6 +578,10 @@ class Ui_Form(object):
                         if col == 5 and row in rows:
                             item = str('LEITO NÃO LIBERADO')
                         ws.cell(row=row + 2, column=col + 1, value=item)
+
+            ws.cell(row= 2, column=col + 2, value=self.total_hora)
+            ws.cell(row= 2, column=col + 3, value=self.porcentagem)
+
             for row in ws.iter_rows():
                 for cell in row:
                     cell.alignment = Alignment(horizontal='center', vertical='center')
@@ -387,29 +590,25 @@ class Ui_Form(object):
             wb.save(filename)
 
     def retranslateUi(self, Form):
+        hora_formatada = self.timer_edit.time()
+        x = hora_formatada.toString("HH:mm:ss")
+
         _translate = QtCore.QCoreApplication.translate
         item = self.tabela_relatorio.horizontalHeaderItem(0)
         item.setText(_translate('Form', 'DATA DA ALTA'))
         item = self.tabela_relatorio.horizontalHeaderItem(1)
-        item.setText(_translate('Form', 'HORA DE CONFIRMAÇÃO DA ALTA'))
+        item.setText(_translate('Form', 'HORA DE SOLICITAÇÃO DA ALTA'))
         item = self.tabela_relatorio.horizontalHeaderItem(2)
         item.setText(_translate('Form', 'NOME DO PACIENTE'))
         item = self.tabela_relatorio.horizontalHeaderItem(3)
-        item.setText(_translate('Form', 'UNIDADE DE INTERNAÇÃO ATUAL'))
-        item = self.tabela_relatorio.horizontalHeaderItem(4)
-        item.setText(_translate('Form', 'LEITO ATUAL'))
-        item = self.tabela_relatorio.horizontalHeaderItem(5)
-        item.setText(_translate('Form', 'TEMPO MÉDIO NO MÊS PARA LIBERAÇÃO DE LEITOS:         '))
-        item = self.tabela_relatorio.horizontalHeaderItem(6)
         item.setText(_translate('Form', 'STATUS DA SOLICITAÇÃO'))
-        item = self.tabela_relatorio.horizontalHeaderItem(7)
-        item.setText(_translate('Form', "TAXA DE OCUPAÇÃO DOS CTI'S"))
-        item = self.tabela_relatorio.horizontalHeaderItem(8)
-        item.setText(_translate('Form', 'TAXA DE OCUPAÇÃO DAS ENFERMARIAS'))
-        item = self.tabela_relatorio.horizontalHeaderItem(9)
-        item.setText(_translate('Form', '%  DE ALTAS ABAIXO DA META:      '))
-        item = self.tabela_relatorio.horizontalHeaderItem(10)
-        item.setText(_translate('Form', '%  DE ALTAS EM  HORAS:      '))
+        item = self.tabela_relatorio.horizontalHeaderItem(4)
+        item.setText(_translate('Form', 'DATA E HORÁRIO DA CONFIRMAÇÃO DA ALTA'))
+        item = self.tabela_relatorio.horizontalHeaderItem(5)
+        item.setText(_translate('Form', 'TEMPO DE LIBERAÇÃO DE LEITO PARA ALTAS DO CTI:         '))
+        item = self.tabela_relatorio.horizontalHeaderItem(6)
+        item.setText(_translate('Form', f"LIBERADO ANTES DE {x} "))
+
         for coluna in range(1, self.tabela_relatorio.columnCount()):
             item_pac = self.tabela_relatorio.horizontalHeaderItem(coluna).text()
             font_tabela = self.tabela_relatorio.font()

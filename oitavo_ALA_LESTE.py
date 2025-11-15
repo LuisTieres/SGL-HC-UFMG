@@ -769,10 +769,15 @@ class Ui_Form(object):
         self.labels = []
         if self.tela.help_sccrol_painel:
             self.tela.monitora = False
-            self.tela.abri_cti(Form, 'UNIDADE DE INTERNAÇÃO - 08L')
-
+            #self.tela.abri_cti(Form, 'UNIDADE DE INTERNAÇÃO - 08L')
+            for cont, id in enumerate(self.tela.lista_titulo):
+                if id == 'UNIDADE DE INTERNAÇÃO - 08L':
+                    self.tela.abri_cti(Form, self.tela.lista_ids[cont], self.tela.lista_titulo[cont], self.tela.lista_dos_btn[cont])
+                    break
         for row in range(self.tela.conta_linha()):
             leito = self.tela.leito(row)
+            if 'aguardando' in leito.text():
+                continue
             if self.tela.help_sccrol_painel:
                 label = QLabel(leito.text(), self.frame_tela)
             else:
@@ -794,7 +799,7 @@ class Ui_Form(object):
                             label.setGeometry(x, y, 70, 25)
                             break
             except FileNotFoundError:
-                print("File not found")
+                print('Arquivo CSV não encontrado. Criando novo arquivo.')
 
             label.setAlignment(Qt.AlignmentFlag.AlignCenter)
             label.setCursor(Qt.CursorShape.OpenHandCursor)
@@ -839,7 +844,6 @@ class Ui_Form(object):
             paciente = self.tela.item(row, colum_nome).text()
             self.total += 1
             if selecao.text() == 'VAGO':
-                print(1)
                 self.vago += 1
                 for label in self.labels:
                     if label.text() == LEITOS:
@@ -859,10 +863,8 @@ class Ui_Form(object):
                         label.setStyleSheet('background-color: rgb(255, 0, 0);')
                 self.ocupado += 1
             if selecao.text() == 'RESERVADO':
-                print(4145)
                 for label in self.labels:
                     if label.text() == LEITOS:
-                        print(LEITOS)
                         label.setAlignment(Qt.AlignmentFlag.AlignCenter)
                         tooltip_text = f'Paciente: {paciente} \n Leito: {LEITOS}'
                         label.setToolTip(tooltip_text)

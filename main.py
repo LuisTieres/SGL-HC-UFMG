@@ -1,27 +1,31 @@
 import sys
-from PyQt6.QtWidgets import QTableWidgetItem, QFileDialog, QComboBox, QApplication, QTableWidget, QVBoxLayout, QPushButton, QWidget, QFrame, QScrollArea, QHBoxLayout, QSpacerItem, QSizePolicy, QLabel
-from PyQt6 import QtCore, QtGui, QtWidgets
-from PyQt6.QtCore import Qt, QSettings, QStandardPaths
-from openpyxl import Workbook
-from PyQt6.QtGui import QGuiApplication
-from openpyxl import load_workbook
-from datetime import datetime, timedelta
-import os
-import datetime
-import re
-from openpyxl import load_workbook
-from PyQt6.QtCore import QDateTime
+from PyQt6.QtWidgets import (
+    QApplication, QWidget, QVBoxLayout, QHBoxLayout,
+    QPushButton, QDateEdit, QTableWidget, QTableWidgetItem,
+    QScrollArea, QFrame, QFileDialog
+)
+from PyQt6.QtCore import Qt, QDate
+import pymysql
+import pandas as pd
+from datetime import datetime
 
-class Ui_Form(object):
-    def setupUi(self, Form, frame, tela):
-        self.tela = tela
-        self.settings = QSettings('HC', 'SGL')
-        self.form = Form
-        script_directory = QStandardPaths.writableLocation(QStandardPaths.StandardLocation.AppDataLocation)
-        config_file_path = f'{script_directory}/config.ini'
-        self.settings = QSettings(config_file_path, QSettings.Format.IniFormat)
+# Configurações do banco
+DB_CONFIG = {
+    'host': '10.36.0.32',
+    'user': 'sglHC2024',
+    'password': 'S4g1L81',
+    'database': 'sgl'
+}
 
-        self.frame_principal = frame
+
+class SensoApp(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Senso Diário")
+        self.resize(1200, 600)
+
+        # Frame principal
+        self.frame_principal = QFrame(self)
         self.frame_principal.setFrameShape(QFrame.Shape.StyledPanel)
 
         layout_principal = QVBoxLayout(self)
@@ -90,11 +94,11 @@ class Ui_Form(object):
 
         # Buscar dados por mês/ano
         cursor.execute("""
-                    SELECT data, ala, ocupacao, bloqueios, cnes, ocupacao_percentual, leitos_disponiveis
-                    FROM senso_diario
-                    WHERE MONTH(data) = %s AND YEAR(data) = %s
-                    ORDER BY data
-                """, (mes, ano))
+            SELECT data, ala, ocupacao, bloqueios, cnes, ocupacao_percentual, leitos_disponiveis
+            FROM senso_diario
+            WHERE MONTH(data) = %s AND YEAR(data) = %s
+            ORDER BY data
+        """, (mes, ano))
         resultados = cursor.fetchall()
         conexao.close()
 
@@ -166,3 +170,8 @@ class Ui_Form(object):
         return pd.DataFrame(dados, columns=colunas)
 
 
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    win = SensoApp()
+    win.show()
+    sys.exit(app.exec())

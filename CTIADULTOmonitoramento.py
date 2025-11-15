@@ -337,10 +337,16 @@ class Ui_Form(object):
         self.label_vago1_2.setObjectName('label_vago1_2')
         if self.tela.scroll_painel.isVisible() or self.tela.help_sccrol_painel == True:
             self.tela.monitora = False
-            self.tela.abri_cti(Form, 'CTI ADULTO - 03L')
+            #self.tela.abri_cti(Form, 'CTI ADULTO - 03L')
+            for cont, id in enumerate(self.tela.lista_titulo):
+                if id == 'CTI ADULTO - 03L':
+                    self.tela.abri_cti(Form, self.tela.lista_ids[cont], self.tela.lista_titulo[cont], self.tela.lista_dos_btn[cont])
+                    break
         self.labels = []
         for row in range(self.tela.conta_linha()):
             leito = self.tela.leito(row)
+            if 'aguardando' in leito.text():
+                continue
             if self.tela.scroll_painel.isVisible() or self.tela.help_sccrol_painel:
                 label = QLabel(leito.text(), self.frame_tela)
             else:  # inserted
@@ -348,7 +354,7 @@ class Ui_Form(object):
             label.setGeometry(0, 20, 60, 25)
 
             filename = 'monitora_3_leste.csv'
-            if self.tela.scroll_painel.isVisible() or self.tela.help_sccrol_painel:
+            if self.tela.scroll_painel.isVisible() or self.tela.help_sccrol_painel == True:
                 filename = 'monitora_monitora_3_lestepainel.csv'
 
             try:
@@ -362,7 +368,7 @@ class Ui_Form(object):
                             label.setGeometry(x, y, 70, 25)
                             break
             except FileNotFoundError:
-                print("File not found:", filename)
+                print('Arquivo não encontrado, criando novo arquivo.')
 
             label.setAlignment(Qt.AlignmentFlag.AlignCenter)
             label.setCursor(Qt.CursorShape.OpenHandCursor)

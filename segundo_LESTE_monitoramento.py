@@ -529,10 +529,16 @@ class Ui_Form(object):
         self.lisa = self.tela.retornar_frame()
         if self.tela.help_sccrol_painel == True:
             self.tela.monitora = False
-            self.tela.abri_cti(Form, 'UNIDADE DE INTERNAÇÃO - 02L')
+            # self.tela.abri_cti(Form, 'UNIDADE DE INTERNAÇÃO - 02L')
+            for cont, id in enumerate(self.tela.lista_titulo):
+                if id == 'UNIDADE DE INTERNAÇÃO - 02L':
+                    self.tela.abri_cti(Form, self.tela.lista_ids[cont], self.tela.lista_titulo[cont], self.tela.lista_dos_btn[cont])
+                    break
         for row in range(self.tela.conta_linha()):
             leito = self.tela.leito(row)
 
+            if 'aguardando' in leito.text():
+                continue
             if self.tela.help_sccrol_painel:
                 label = QLabel(leito.text(), self.frame_tela)
             else:
@@ -559,18 +565,18 @@ class Ui_Form(object):
                             break
 
                     # Configurações adicionais para o label
-                    label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-                    label.setCursor(Qt.CursorShape.OpenHandCursor)
-                    label.mousePressEvent = lambda event, label_aux=label: self.mousePressEvent(event, label_aux)
-                    label.mouseMoveEvent = lambda event, label_aux=label: self.mouseMoveEvent(event, label_aux)
-                    label.setStyleSheet('background-color: rgb(170, 255, 255);')
-                    label.setWordWrap(True)
-                    self.lisa.append(label)
-                    self.atualizar_monitoramento(Form)
+
 
             except FileNotFoundError:
-                print(f"Arquivo {filename} não encontrado.")
-
+                print(f'Arquivo {filename} não encontrado. Usando posição padrão.')
+            label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            label.setCursor(Qt.CursorShape.OpenHandCursor)
+            label.mousePressEvent = lambda event, label_aux=label: self.mousePressEvent(event, label_aux)
+            label.mouseMoveEvent = lambda event, label_aux=label: self.mouseMoveEvent(event, label_aux)
+            label.setStyleSheet('background-color: rgb(170, 255, 255);')
+            label.setWordWrap(True)
+            self.lisa.append(label)
+            self.atualizar_monitoramento(Form)
             self.conf_layout()
             if self.tela.help_sccrol_painel:
                 self.frame.move(0, 178)

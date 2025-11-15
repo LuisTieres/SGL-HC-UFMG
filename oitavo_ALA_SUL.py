@@ -474,10 +474,16 @@ class Ui_Form(object):
         self.frame_10.setObjectName('frame_10')
         if self.tela.help_sccrol_painel == True:
             self.tela.monitora = False
-            self.tela.abri_cti(Form, 'UNIDADE DE INTERNAÇÃO - 08S')
+            #self.tela.abri_cti(Form, 'UNIDADE DE INTERNAÇÃO - 08S')
+            for cont, id in enumerate(self.tela.lista_titulo):
+                if id == 'UNIDADE DE INTERNAÇÃO - 08S':
+                    self.tela.abri_cti(Form, self.tela.lista_ids[cont], self.tela.lista_titulo[cont], self.tela.lista_dos_btn[cont])
+                    break
         self.labels = []
         for row in range(self.tela.conta_linha()):
             leito = self.tela.leito(row)
+            if 'aguardando' in leito.text():
+                continue
             if self.tela.help_sccrol_painel:
                 label = QLabel(leito.text(), self.frame_tela)
             else:
@@ -500,8 +506,7 @@ class Ui_Form(object):
                             label.setGeometry(x, y, 70, 25)
                             break
             except FileNotFoundError:
-                print("Arquivo não encontrado:", filename)
-
+                print("Arquivo CSV não encontrado. Usando posição padrão.")
             label.setAlignment(Qt.AlignmentFlag.AlignCenter)
             label.setCursor(Qt.CursorShape.OpenHandCursor)
             label.mousePressEvent = lambda event, label_aux=label: self.mousePressEvent(event, label_aux)
@@ -514,7 +519,6 @@ class Ui_Form(object):
             self.labels.append(label)
 
         self.atualizar_monitoramento(Form)
-
         if not self.tela.help_sccrol_painel:
             self.conf_layout()
             if self.tela.help_sccrol_painel:
@@ -568,10 +572,8 @@ class Ui_Form(object):
                         label.setStyleSheet('background-color: rgb(255, 0, 0);')
                 self.ocupado += 1
             if selecao.text() == 'RESERVADO':
-                print(4145)
                 for label in self.labels:
                     if label.text() == LEITOS:
-                        print(LEITOS)
                         label.setAlignment(Qt.AlignmentFlag.AlignCenter)
                         tooltip_text = f'Paciente: {paciente} \n Leito: {LEITOS}'
                         label.setToolTip(tooltip_text)

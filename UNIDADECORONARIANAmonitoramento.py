@@ -316,11 +316,17 @@ class Ui_Form(object):
 
         if self.tela.help_sccrol_painel == True:
             self.tela.monitora = False
-            self.tela.abri_cti(Form, 'UNIDADE DE INTERNAÇÃO CORONARIANA - 03N')
+
+            for cont, id in enumerate(self.tela.lista_titulo):
+                if id == 'UNIDADE DE INTERNAÇÃO CORONARIANA - 03N':
+                    self.tela.abri_cti(Form, self.tela.lista_ids[cont], self.tela.lista_titulo[cont], self.tela.lista_dos_btn[cont])
+                    break
         self.labels = []
 
         for row in range(self.tela.conta_linha()):
             leito = self.tela.leito(row)
+            if 'aguardando' in leito.text():
+                continue
             if self.tela.help_sccrol_painel:
                 label = QLabel(leito.text(), self.frame_tela)
             else:
@@ -354,7 +360,7 @@ class Ui_Form(object):
 
                     self.labels.append(label)
             except FileNotFoundError:
-                print(1)
+                print('Arquivo não encontrado:', filename)
             self.atualizar_monitoramento(Form)
             self.conf_layout()
             if self.tela.help_sccrol_painel:
@@ -411,7 +417,6 @@ class Ui_Form(object):
             if selecao.text() == 'RESERVADO':
                 for label in self.labels:
                     if label.text() == LEITOS:
-                        print(LEITOS)
                         label.setAlignment(Qt.AlignmentFlag.AlignCenter)
                         tooltip_text = f'Paciente: {paciente} \n Leito: {LEITOS}'
                         label.setToolTip(tooltip_text)

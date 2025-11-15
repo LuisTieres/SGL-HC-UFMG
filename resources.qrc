@@ -1,0 +1,50 @@
+<!-- resources.qrc -->
+<RCC>
+  <qresource prefix="/">
+    <file>imagens/54638.ico</file>
+    <file>imagens/Alta.ico</file>
+    <file>imagens/alterar.ico</file>
+    <file>imagens/cadeado-desbloqueado.png</file>
+    <file>imagens/checkbox_checked.png</file>
+    <file>imagens/config.ico</file>
+    <file>imagens/configuracao.ico</file>
+    <file>imagens/configuracoes-_1_.ico</file>
+    <file>imagens/documentario.ico</file>
+    <file>imagens/do-utilizador.ico</file>
+    <file>imagens/download.ico</file>
+    <file>imagens/ebhseh.ico</file>
+    <file>imagens/emergencia.ico</file>
+    <file>imagens/escondido.png</file>
+    <file>imagens/excluir.ico</file>
+    <file>imagens/ferramenta-lapis.ico</file>
+    <file>imagens/filtro.ico</file>
+    <file>imagens/hospital.ico</file>
+    <file>imagens/icon_title.png</file>
+    <file>imagens/icon_transparent.ico</file>
+    <file>imagens/icone_p.png</file>
+    <file>imagens/icone_p_eUO_icon.ico</file>
+    <file>imagens/informacao.ico</file>
+    <file>imagens/INICIO.jfif</file>
+    <file>imagens/INICIO.jpg</file>
+    <file>imagens/jogar.ico</file>
+    <file>imagens/Logo_da_EBSERH.ico</file>
+    <file>imagens/lupa.ico</file>
+    <file>imagens/menu_icon_150667.ico</file>
+    <file>imagens/menu_volta.ico</file>
+    <file>imagens/notificacao.ico</file>
+    <file>imagens/olho.png</file>
+    <file>imagens/novo-email.ico</file>
+    <file>imagens/procurar.ico</file>
+    <file>imagens/re.ico</file>
+    <file>imagens/reservar.ico</file>
+    <file>imagens/sgl.ico</file>
+    <file>imagens/sgl.png</file>
+    <file>imagens/sigla.png</file>
+    <file>imagens/silhueta-de-multiplos-usuarios.ico</file>
+    <file>imagens/sombra-de-usuario-masculino.png</file>
+    <file>imagens/Untitled-design-_1_.ico</file>
+    <file>imagens/Untitled-design-_2_.ico</file>
+    <file>imagens/user.ico</file>
+    <file>imagens/warning.ico</file>
+  </qresource>
+</RCC>
